@@ -19,6 +19,15 @@ A beautiful, modern task management application built with Laravel, Tailwind CSS
 - **💾 Persistent Preferences**: Theme and language preferences saved in localStorage
 - **🎨 Custom Column Colors**: Choose custom colors for each column
 - **⚡ Real-time Ready**: Built with Laravel Broadcasting support for real-time updates
+- **✏️ Task Editing**: Click on any task to edit it inline
+- **🔍 Search & Filter**: Real-time search and filter by priority
+- **🏷️ Tag Management**: Create, manage, and organize tasks with custom tags
+- **📢 Toast Notifications**: User-friendly notifications for all actions
+- **⌨️ Keyboard Shortcuts**: Fast navigation with keyboard shortcuts (N, B, T, D, L, /, ESC)
+- **📱 Mobile Optimized**: Touch-friendly drag & drop for mobile devices
+- **⏰ Overdue Indicators**: Visual indicators for tasks past their due date
+- **🎯 Empty States**: Helpful placeholders when columns or boards are empty
+- **🌐 Locale-aware Dates**: Dates formatted according to selected language
 
 ## Tech Stack
 
@@ -103,7 +112,7 @@ A beautiful, modern task management application built with Laravel, Tailwind CSS
 
 ### Creating Tasks
 
-1. Click the "New Task" button in the header
+1. Click the "New Task" button in the header (or press **N**)
 2. Fill in the task details:
    - Select a column
    - Enter task title (required)
@@ -112,19 +121,54 @@ A beautiful, modern task management application built with Laravel, Tailwind CSS
    - Set due date (optional)
 3. Click "Create Task"
 
+### Editing Tasks
+
+1. Click on any task title or the edit icon
+2. Modify any task details
+3. Click "Save" to update
+
+### Managing Tags
+
+1. Click the "Tags" button in the header (or press **T**)
+2. View all existing tags
+3. Create new tags with custom names and colors
+4. Delete unused tags
+
 ### Moving Tasks
 
 Simply drag and drop tasks between columns! The position will be saved automatically.
 
+### Searching and Filtering
+
+1. Use the search bar to find tasks by title or description
+2. Filter tasks by priority using the dropdown
+3. Click "Clear Filters" to reset
+
 ### Deleting Tasks
 
-Click the trash icon on any task card to delete it.
+Click the trash icon on any task card to delete it (confirmation required).
 
 ### Theme & Language
 
-- **Toggle Dark Mode**: Click the sun/moon icon in the header
-- **Change Language**: Click the language button (EN/RU) in the header
+- **Toggle Dark Mode**: Click the sun/moon icon in the header (or press **D**)
+- **Change Language**: Click the language button (EN/RU) in the header (or press **L**)
 - Your preferences are automatically saved!
+
+### Keyboard Shortcuts
+
+Access common actions quickly with keyboard shortcuts:
+
+| Shortcut | Action |
+|----------|--------|
+| **N** | Create new task |
+| **B** | Open boards menu |
+| **T** | Manage tags |
+| **D** | Toggle dark mode |
+| **L** | Switch language |
+| **/** | Focus search bar |
+| **ESC** | Close any modal |
+
+*Click the help button (bottom-right corner) to view shortcuts anytime*
 
 ## Project Structure
 
@@ -258,25 +302,43 @@ theme: {
 
 - ✅ **Multi-board management** - Create and switch between multiple boards
 - ✅ **Dynamic column management** - Add, edit, and delete columns
-- ✅ **Dark mode** - Full dark theme support with toggle
-- ✅ **Multi-language** - English and Russian support
-- ✅ **Drag & drop** - Move tasks between columns
-- ✅ **Task priorities** - Low, Medium, High, Urgent
-- ✅ **Custom colors** - Choose colors for columns
-- ✅ **Persistent preferences** - Theme and language saved locally
+- ✅ **Task CRUD operations** - Create, read, update, and delete tasks
+- ✅ **Task editing** - Click to edit tasks inline
+- ✅ **Tag system** - Create and manage custom tags with colors
+- ✅ **Search functionality** - Real-time search across task titles and descriptions
+- ✅ **Priority filtering** - Filter tasks by priority level
+- ✅ **Dark mode** - Full dark theme support with smooth transitions
+- ✅ **Multi-language** - English and Russian support with locale-aware dates
+- ✅ **Drag & drop** - Smooth task movement between columns
+- ✅ **Task priorities** - Low, Medium, High, Urgent levels
+- ✅ **Custom colors** - Choose colors for columns and tags
+- ✅ **Persistent preferences** - Theme and language saved in localStorage
+- ✅ **Toast notifications** - Real-time user feedback for all actions
+- ✅ **Keyboard shortcuts** - Fast navigation with hotkeys
+- ✅ **Empty states** - Helpful placeholders for empty columns and boards
+- ✅ **Overdue indicators** - Visual markers for tasks past due date
+- ✅ **Loading states** - Spinner overlay during async operations
+- ✅ **Mobile responsive** - Touch-friendly drag & drop for mobile devices
+- ✅ **Smooth animations** - Fade-in and slide-up effects
+- ✅ **Custom scrollbars** - Themed scrollbars for better aesthetics
 
 ## Future Enhancements
 
 - [ ] Real-time collaboration with Pusher/Laravel Echo
-- [ ] Task search and filtering
-- [ ] User authentication
-- [ ] Task assignments
-- [ ] File attachments
-- [ ] Activity timeline
-- [ ] Export to PDF/CSV
-- [ ] Task comments
-- [ ] Keyboard shortcuts
-- [ ] Task templates
+- [ ] User authentication and permissions
+- [ ] Task assignments to team members
+- [ ] File attachments for tasks
+- [ ] Activity timeline and history
+- [ ] Export board to PDF/CSV/JSON
+- [ ] Task comments and discussions
+- [ ] Task templates for quick creation
+- [ ] Subtasks/checklists within tasks
+- [ ] Task statistics and analytics dashboard
+- [ ] Due date reminders and notifications
+- [ ] Calendar view
+- [ ] Time tracking
+- [ ] Task dependencies
+- [ ] Recurring tasks
 
 ## Contributing
 

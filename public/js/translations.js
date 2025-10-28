@@ -30,6 +30,29 @@ const translations = {
         select_column: 'Select a column',
         enter_task_title: 'Enter task title',
         enter_task_description: 'Enter task description',
+        no_tasks: 'No tasks yet',
+        add_first_task: 'Add your first task',
+        no_boards: 'No boards yet',
+        create_first_board: 'Create your first board',
+
+        tags: 'Tags',
+        tag: 'Tag',
+        new_tag: 'New Tag',
+        create_tag: 'Create Tag',
+        edit_tag: 'Edit Tag',
+        delete_tag: 'Delete Tag',
+        tag_name: 'Tag Name',
+        tag_color: 'Tag Color',
+        manage_tags: 'Manage Tags',
+
+        search: 'Search tasks...',
+        filter: 'Filter',
+        filter_by_priority: 'Filter by priority',
+        filter_by_tags: 'Filter by tags',
+        clear_filters: 'Clear filters',
+
+        loading: 'Loading...',
+        saving: 'Saving...',
 
         priority: {
             low: 'Low',
@@ -50,7 +73,18 @@ const translations = {
             delete_task: 'Are you sure you want to delete this task?',
             delete_column: 'Are you sure you want to delete this column? All tasks in it will be deleted.',
             delete_board: 'Are you sure you want to delete this board?',
+            delete_tag: 'Are you sure you want to delete this tag?',
         },
+
+        messages: {
+            task_created: 'Task created successfully',
+            task_updated: 'Task updated successfully',
+            task_deleted: 'Task deleted successfully',
+            tag_created: 'Tag created successfully',
+            tag_deleted: 'Tag deleted successfully',
+        },
+
+        no_tags: 'No tags yet',
 
         theme: {
             light: 'Light Theme',
@@ -91,6 +125,29 @@ const translations = {
         select_column: 'Выберите колонку',
         enter_task_title: 'Введите название задачи',
         enter_task_description: 'Введите описание задачи',
+        no_tasks: 'Пока нет задач',
+        add_first_task: 'Добавить первую задачу',
+        no_boards: 'Пока нет досок',
+        create_first_board: 'Создать первую доску',
+
+        tags: 'Теги',
+        tag: 'Тег',
+        new_tag: 'Новый тег',
+        create_tag: 'Создать тег',
+        edit_tag: 'Редактировать тег',
+        delete_tag: 'Удалить тег',
+        tag_name: 'Название тега',
+        tag_color: 'Цвет тега',
+        manage_tags: 'Управление тегами',
+
+        search: 'Поиск задач...',
+        filter: 'Фильтр',
+        filter_by_priority: 'Фильтр по приоритету',
+        filter_by_tags: 'Фильтр по тегам',
+        clear_filters: 'Очистить фильтры',
+
+        loading: 'Загрузка...',
+        saving: 'Сохранение...',
 
         priority: {
             low: 'Низкий',
@@ -111,7 +168,18 @@ const translations = {
             delete_task: 'Вы уверены, что хотите удалить эту задачу?',
             delete_column: 'Вы уверены, что хотите удалить эту колонку? Все задачи в ней будут удалены.',
             delete_board: 'Вы уверены, что хотите удалить эту доску?',
+            delete_tag: 'Вы уверены, что хотите удалить этот тег?',
         },
+
+        messages: {
+            task_created: 'Задача успешно создана',
+            task_updated: 'Задача успешно обновлена',
+            task_deleted: 'Задача успешно удалена',
+            tag_created: 'Тег успешно создан',
+            tag_deleted: 'Тег успешно удалён',
+        },
+
+        no_tags: 'Пока нет тегов',
 
         theme: {
             light: 'Светлая тема',
