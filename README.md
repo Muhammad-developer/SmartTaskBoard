@@ -1,162 +1,216 @@
-# Smart Task Board
+# SmartTaskBoard
 
-A beautiful, modern task management application built with Laravel, Tailwind CSS, and Alpine.js. Features drag-and-drop functionality, dark mode, multi-language support, and a stunning UI.
+A modern, collaborative task management application built with Laravel. SmartTaskBoard provides teams with an intuitive Kanban-style board for organizing tasks, managing projects, and collaborating effectively.
 
 ## Features
 
-### Core Features
-- **Drag & Drop**: Intuitive drag-and-drop interface powered by SortableJS
-- **Beautiful UI**: Modern, clean design with Tailwind CSS and smooth animations
-- **Task Management**: Create, update, and delete tasks with priorities and due dates
-- **Tags System**: Organize tasks with custom colored tags
-- **Multiple Boards**: Create and manage multiple task boards
-- **Dynamic Columns**: Add, edit, and delete columns with custom names and colors
+### Task Management
+- **Kanban Board Interface**: Drag-and-drop tasks between customizable columns (Todo, In Progress, Done)
+- **Task CRUD Operations**: Create, read, update, and delete tasks with rich details
+- **Task Search & Filtering**: Quickly find tasks by title, description, tags, or status
+- **Task Editing**: Inline editing capabilities for quick updates
+- **Priority Levels**: Assign priority levels to tasks for better organization
+- **Due Dates**: Set deadlines and track task timelines
+- **Attachments**: Upload and manage files associated with tasks
+
+### Team Collaboration
+- **Team Management**: Create and manage multiple teams
+- **Role-Based Access Control**: Owner, Admin, and Member roles with different permissions
+- **Team Invitations**: Invite members via email with secure token-based system
+- **Member Management**: Add, remove, and update team member roles
+- **Activity Tracking**: Monitor team activities and task changes
+
+### Tags & Organization
+- **Tag System**: Create and assign custom tags to tasks
+- **Color-Coded Tags**: Visual organization with customizable tag colors
+- **Tag Management**: Create, edit, and delete tags
+- **Tag Filtering**: Filter tasks by single or multiple tags
+
+### Comments & Communication
+- **Task Comments**: Add comments to tasks for discussions
+- **Real-time Updates**: Keep team members informed of changes
+- **Comment Management**: Edit and delete your own comments
+- **Mention System**: Tag team members in comments (future feature)
+
+### User Management
+- **Authentication**: Secure user registration and login
+- **Profile Management**: Update user information and preferences
+- **Password Reset**: Secure password recovery system
+- **API Token Authentication**: Secure API access with Sanctum
+
+### UI & UX Features
+- **Dark Mode**: Full dark theme support with smooth transitions
+- **Multi-Language**: Support for English and Russian languages
 - **Responsive Design**: Works perfectly on desktop and mobile devices
+- **Keyboard Shortcuts**: Fast navigation with hotkeys
+- **Toast Notifications**: User-friendly notifications for all actions
+- **Empty States**: Helpful placeholders when columns or boards are empty
+- **Overdue Indicators**: Visual markers for tasks past due date
 
-### Advanced Features
-- **🌙 Dark Mode**: Full dark theme support with smooth transitions
-- **🌍 Multi-Language**: Support for English and Russian languages
-- **💾 Persistent Preferences**: Theme and language preferences saved in localStorage
-- **🎨 Custom Column Colors**: Choose custom colors for each column
-- **⚡ Real-time Ready**: Built with Laravel Broadcasting support for real-time updates
-- **✏️ Task Editing**: Click on any task to edit it inline
-- **🔍 Search & Filter**: Real-time search and filter by priority
-- **🏷️ Tag Management**: Create, manage, and organize tasks with custom tags
-- **📢 Toast Notifications**: User-friendly notifications for all actions
-- **⌨️ Keyboard Shortcuts**: Fast navigation with keyboard shortcuts (N, B, T, D, L, /, ESC)
-- **📱 Mobile Optimized**: Touch-friendly drag & drop for mobile devices
-- **⏰ Overdue Indicators**: Visual indicators for tasks past their due date
-- **🎯 Empty States**: Helpful placeholders when columns or boards are empty
-- **🌐 Locale-aware Dates**: Dates formatted according to selected language
+## Technology Stack
 
-## Tech Stack
-
-- **Backend**: Laravel 12
-- **Frontend**: Tailwind CSS 3 + Alpine.js 3
-- **Build Tool**: Vite 5
+- **Backend**: Laravel 10.x
+- **Database**: MySQL/PostgreSQL/SQLite
+- **Authentication**: Laravel Sanctum
+- **Testing**: PHPUnit
+- **CI/CD**: GitHub Actions
+- **Frontend**: Tailwind CSS + Alpine.js
+- **Build Tool**: Vite
 - **Drag & Drop**: SortableJS
-- **Database**: SQLite (default, can be changed to MySQL/PostgreSQL)
+
+## Requirements
+
+- PHP >= 8.2
+- Composer
+- MySQL >= 5.7 or PostgreSQL >= 10
+- Node.js >= 16.x
+- NPM or Yarn
 
 ## Installation
 
-### Prerequisites
+### 1. Clone the Repository
 
-- PHP 8.2 or higher
-- Composer
-- Node.js 18 or higher
-- npm
+```bash
+git clone https://github.com/yourusername/SmartTaskBoard.git
+cd SmartTaskBoard
+```
 
-### Steps
+### 2. Install Dependencies
 
-1. **Clone the repository**
-   ```bash
-   git clone <repository-url>
-   cd SmartTaskBoard
-   ```
+```bash
+composer install
+npm install
+```
 
-2. **Install PHP dependencies**
-   ```bash
-   composer install
-   ```
+### 3. Environment Configuration
 
-3. **Install Node.js dependencies**
-   ```bash
-   npm install
-   ```
+```bash
+cp .env.example .env
+php artisan key:generate
+```
 
-4. **Configure environment**
-   ```bash
-   cp .env.example .env
-   php artisan key:generate
-   ```
+Edit `.env` file with your database credentials:
 
-5. **Run migrations**
-   ```bash
-   php artisan migrate:fresh
-   ```
+```env
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=smarttaskboard
+DB_USERNAME=your_username
+DB_PASSWORD=your_password
+```
 
-6. **Start development servers**
+### 4. Database Setup
 
-   In one terminal:
-   ```bash
-   npm run dev
-   ```
+```bash
+php artisan migrate --seed
+```
 
-   In another terminal:
-   ```bash
-   php artisan serve
-   ```
+### 5. Build Frontend Assets
 
-7. **Open your browser**
+```bash
+npm run build
+```
 
-   Navigate to `http://localhost:8000`
+For development:
 
-## Usage
+```bash
+npm run dev
+```
 
-### Managing Boards
+### 6. Start the Application
 
-1. **View All Boards**: Click the "Boards" button in the header
-2. **Create New Board**:
-   - Click "Boards" button
-   - Click "New Board" in the modal
-   - Enter board name and description
-   - Click "Create"
-3. **Switch Boards**: Click on any board name in the boards list
+```bash
+php artisan serve
+```
 
-### Managing Columns
+The application will be available at `http://localhost:8000`
 
-1. **Add Column**: Click the "Add Column" button at the end of the board
-2. **Edit Column**: Click the edit icon in the column header
-3. **Delete Column**: Click the trash icon in the column header
-4. **Customize Colors**: Choose custom colors when creating or editing columns
+## Docker Installation (Alternative)
+
+### 1. Build and Start Containers
+
+```bash
+docker-compose up -d
+```
+
+### 2. Install Dependencies
+
+```bash
+docker-compose exec app composer install
+docker-compose exec app npm install
+```
+
+### 3. Setup Application
+
+```bash
+docker-compose exec app php artisan key:generate
+docker-compose exec app php artisan migrate --seed
+docker-compose exec app npm run build
+```
+
+The application will be available at `http://localhost:8000`
+
+## Usage Guide
+
+### Creating Your First Team
+
+1. Register a new account or login
+2. Navigate to Teams section
+3. Click "Create Team"
+4. Enter team name and description
+5. You'll be automatically assigned as the team owner
+
+### Adding Team Members
+
+1. Go to your team settings
+2. Click "Invite Member"
+3. Enter the member's email address and select their role
+4. An invitation will be sent to their email
+5. They can accept the invitation to join your team
 
 ### Creating Tasks
 
-1. Click the "New Task" button in the header (or press **N**)
-2. Fill in the task details:
-   - Select a column
-   - Enter task title (required)
-   - Add description (optional)
-   - Set priority level (Low, Medium, High, Urgent)
-   - Set due date (optional)
-3. Click "Create Task"
-
-### Editing Tasks
-
-1. Click on any task title or the edit icon
-2. Modify any task details
-3. Click "Save" to update
-
-### Managing Tags
-
-1. Click the "Tags" button in the header (or press **T**)
-2. View all existing tags
-3. Create new tags with custom names and colors
-4. Delete unused tags
+1. Select a team from the dashboard
+2. Click "Add Task" in any column
+3. Fill in task details:
+   - Title (required)
+   - Description
+   - Priority level
+   - Due date
+   - Assigned member
+   - Tags
+4. Click "Create Task"
 
 ### Moving Tasks
 
-Simply drag and drop tasks between columns! The position will be saved automatically.
+- Drag and drop tasks between columns to update their status
+- Tasks automatically update their status based on the column
+- All team members see updates in real-time
 
-### Searching and Filtering
+### Using Tags
 
-1. Use the search bar to find tasks by title or description
-2. Filter tasks by priority using the dropdown
-3. Click "Clear Filters" to reset
+1. Go to Tag Management
+2. Create new tags with custom names and colors
+3. Assign tags to tasks during creation or editing
+4. Filter tasks by clicking on tags in the filter panel
 
-### Deleting Tasks
+### Search and Filter
 
-Click the trash icon on any task card to delete it (confirmation required).
+- **Search Bar**: Search tasks by title or description
+- **Tag Filter**: Filter by one or multiple tags
+- **Status Filter**: Show tasks from specific columns
+- **Clear Filters**: Reset all filters to show all tasks
 
-### Theme & Language
+### Adding Comments
 
-- **Toggle Dark Mode**: Click the sun/moon icon in the header (or press **D**)
-- **Change Language**: Click the language button (EN/RU) in the header (or press **L**)
-- Your preferences are automatically saved!
+1. Open a task detail view
+2. Scroll to the comments section
+3. Type your comment in the text area
+4. Click "Post Comment"
+5. Edit or delete your own comments as needed
 
 ### Keyboard Shortcuts
-
-Access common actions quickly with keyboard shortcuts:
 
 | Shortcut | Action |
 |----------|--------|
@@ -168,194 +222,322 @@ Access common actions quickly with keyboard shortcuts:
 | **/** | Focus search bar |
 | **ESC** | Close any modal |
 
-*Click the help button (bottom-right corner) to view shortcuts anytime*
+## API Documentation
 
-## Project Structure
+### Authentication Endpoints
 
-```
-SmartTaskBoard/
-├── app/
-│   ├── Http/Controllers/
-│   │   ├── BoardController.php    # Board management & CRUD
-│   │   ├── ColumnController.php   # Column management & CRUD
-│   │   ├── TaskController.php     # Task CRUD and drag-drop
-│   │   └── TagController.php      # Tag management
-│   └── Models/
-│       ├── Board.php              # Board model with relationships
-│       ├── Column.php             # Column model
-│       ├── Task.php               # Task model with tags relationship
-│       └── Tag.php                # Tag model
-├── database/
-│   └── migrations/                # Database schema
-├── lang/
-│   ├── en/
-│   │   └── app.php               # English translations
-│   └── ru/
-│       └── app.php               # Russian translations
-├── public/
-│   └── js/
-│       └── translations.js       # Frontend translations
-├── resources/
-│   ├── css/
-│   │   └── app.css               # Tailwind styles
-│   ├── js/
-│   │   ├── app.js                # Alpine.js setup
-│   │   └── bootstrap.js          # Laravel Echo config
-│   └── views/
-│       ├── layout.blade.php      # Main layout
-│       └── board.blade.php       # Task board with dark mode & i18n
-├── routes/
-│   └── web.php                   # Application routes
-└── tailwind.config.js            # Tailwind configuration
-```
+#### Register User
+```http
+POST /api/register
+Content-Type: application/json
 
-## Customization
-
-### Adding New Languages
-
-1. Create a new language file in `lang/{locale}/app.php`:
-
-```php
-<?php
-return [
-    'boards' => 'Your translation',
-    'tasks' => 'Your translation',
-    // ... other translations
-];
-```
-
-2. Add translations to `public/js/translations.js`:
-
-```javascript
-const translations = {
-    en: { /* English translations */ },
-    ru: { /* Russian translations */ },
-    your_locale: { /* Your translations */ }
-};
-```
-
-3. Update the `toggleLanguage()` method in `board.blade.php` to include your language.
-
-### Customizing Default Columns
-
-Edit the `createDefaultBoard()` method in `BoardController.php`:
-
-```php
-$columns = [
-    ['name' => 'To Do', 'color' => '#ef4444', 'position' => 0],
-    ['name' => 'In Progress', 'color' => '#f59e0b', 'position' => 1],
-    ['name' => 'Your New Column', 'color' => '#3b82f6', 'position' => 2],
-];
-```
-
-### Changing Theme Colors
-
-Edit `tailwind.config.js` to customize the color scheme:
-
-```javascript
-theme: {
-  extend: {
-    colors: {
-      primary: {
-        // Your custom colors
-      },
-    },
-  },
+{
+  "name": "John Doe",
+  "email": "john@example.com",
+  "password": "password123",
+  "password_confirmation": "password123"
 }
 ```
 
-## API Endpoints
+#### Login
+```http
+POST /api/login
+Content-Type: application/json
 
-### Web Routes
-- `GET /` - Display main board
-- `GET /boards/{board}` - Display specific board
+{
+  "email": "john@example.com",
+  "password": "password123"
+}
+```
 
-### Board Management
-- `POST /boards` - Create new board
-- `PUT /boards/{board}` - Update board
-- `DELETE /boards/{board}` - Delete board
-- `GET /api/boards` - Get all boards
-- `GET /api/boards/{board}/data` - Get board data with all tasks
+#### Logout
+```http
+POST /api/logout
+Authorization: Bearer {token}
+```
 
-### Column Management
-- `POST /columns` - Create new column
-- `PUT /columns/{column}` - Update column
-- `DELETE /columns/{column}` - Delete column
+### Task Endpoints
 
-### Task Management
-- `POST /tasks` - Create new task
-- `PUT /tasks/{task}` - Update task
-- `DELETE /tasks/{task}` - Delete task
-- `POST /api/tasks/{task}/move` - Move task to different column/position
-- `POST /api/tasks/{task}/reorder` - Reorder tasks within column
+#### List Tasks
+```http
+GET /api/tasks
+Authorization: Bearer {token}
+```
 
-## Performance
+#### Create Task
+```http
+POST /api/tasks
+Authorization: Bearer {token}
+Content-Type: application/json
 
-- Optimized database queries with eager loading
-- Smooth CSS transitions using Tailwind utilities
-- Efficient drag-and-drop with SortableJS
-- Minimal JavaScript footprint with Alpine.js
-- LocalStorage for theme and language preferences (no server requests)
-- Responsive design with mobile-first approach
+{
+  "title": "Task Title",
+  "description": "Task description",
+  "status": "todo",
+  "priority": "high",
+  "due_date": "2024-12-31",
+  "team_id": 1
+}
+```
 
-## Features Implemented ✅
+#### Update Task
+```http
+PUT /api/tasks/{id}
+Authorization: Bearer {token}
+Content-Type: application/json
 
-- ✅ **Multi-board management** - Create and switch between multiple boards
-- ✅ **Dynamic column management** - Add, edit, and delete columns
-- ✅ **Task CRUD operations** - Create, read, update, and delete tasks
-- ✅ **Task editing** - Click to edit tasks inline
-- ✅ **Tag system** - Create and manage custom tags with colors
-- ✅ **Search functionality** - Real-time search across task titles and descriptions
-- ✅ **Priority filtering** - Filter tasks by priority level
-- ✅ **Dark mode** - Full dark theme support with smooth transitions
-- ✅ **Multi-language** - English and Russian support with locale-aware dates
-- ✅ **Drag & drop** - Smooth task movement between columns
-- ✅ **Task priorities** - Low, Medium, High, Urgent levels
-- ✅ **Custom colors** - Choose colors for columns and tags
-- ✅ **Persistent preferences** - Theme and language saved in localStorage
-- ✅ **Toast notifications** - Real-time user feedback for all actions
-- ✅ **Keyboard shortcuts** - Fast navigation with hotkeys
-- ✅ **Empty states** - Helpful placeholders for empty columns and boards
-- ✅ **Overdue indicators** - Visual markers for tasks past due date
-- ✅ **Loading states** - Spinner overlay during async operations
-- ✅ **Mobile responsive** - Touch-friendly drag & drop for mobile devices
-- ✅ **Smooth animations** - Fade-in and slide-up effects
-- ✅ **Custom scrollbars** - Themed scrollbars for better aesthetics
+{
+  "title": "Updated Title",
+  "status": "in_progress"
+}
+```
 
-## Future Enhancements
+#### Delete Task
+```http
+DELETE /api/tasks/{id}
+Authorization: Bearer {token}
+```
 
-- [ ] Real-time collaboration with Pusher/Laravel Echo
-- [ ] User authentication and permissions
-- [ ] Task assignments to team members
-- [ ] File attachments for tasks
-- [ ] Activity timeline and history
-- [ ] Export board to PDF/CSV/JSON
-- [ ] Task comments and discussions
-- [ ] Task templates for quick creation
-- [ ] Subtasks/checklists within tasks
-- [ ] Task statistics and analytics dashboard
-- [ ] Due date reminders and notifications
-- [ ] Calendar view
-- [ ] Time tracking
-- [ ] Task dependencies
-- [ ] Recurring tasks
+### Team Endpoints
+
+#### Create Team
+```http
+POST /api/teams
+Authorization: Bearer {token}
+Content-Type: application/json
+
+{
+  "name": "Team Name",
+  "description": "Team description"
+}
+```
+
+#### Invite Member
+```http
+POST /api/teams/{id}/invite
+Authorization: Bearer {token}
+Content-Type: application/json
+
+{
+  "email": "member@example.com",
+  "role": "member"
+}
+```
+
+#### Remove Member
+```http
+DELETE /api/teams/{teamId}/members/{userId}
+Authorization: Bearer {token}
+```
+
+### Comment Endpoints
+
+#### Create Comment
+```http
+POST /api/tasks/{taskId}/comments
+Authorization: Bearer {token}
+Content-Type: application/json
+
+{
+  "content": "Comment text"
+}
+```
+
+#### Delete Comment
+```http
+DELETE /api/comments/{id}
+Authorization: Bearer {token}
+```
+
+## Testing
+
+### Run All Tests
+
+```bash
+php artisan test
+```
+
+### Run Specific Test Suite
+
+```bash
+php artisan test --testsuite=Feature
+```
+
+### Run with Coverage
+
+```bash
+php artisan test --coverage
+```
+
+### Run Specific Test File
+
+```bash
+php artisan test tests/Feature/TaskTest.php
+```
+
+## Development
+
+### Code Style
+
+This project follows PSR-12 coding standards. Format your code using:
+
+```bash
+./vendor/bin/pint
+```
+
+### Database Seeding
+
+Seed the database with sample data:
+
+```bash
+php artisan db:seed
+```
+
+### Cache Management
+
+Clear application cache:
+
+```bash
+php artisan cache:clear
+php artisan config:clear
+php artisan route:clear
+php artisan view:clear
+```
 
 ## Contributing
 
-Feel free to submit issues and enhancement requests!
+We welcome contributions to SmartTaskBoard! Please follow these guidelines:
+
+### Getting Started
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/AmazingFeature`)
+3. Make your changes
+4. Write or update tests for your changes
+5. Ensure all tests pass (`php artisan test`)
+6. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+7. Push to the branch (`git push origin feature/AmazingFeature`)
+8. Open a Pull Request
+
+### Pull Request Guidelines
+
+- **Clear Description**: Explain what your PR does and why
+- **Tests Required**: All new features must include tests
+- **Code Style**: Follow PSR-12 standards (run `./vendor/bin/pint`)
+- **Documentation**: Update README.md if adding new features
+- **Single Responsibility**: One feature or fix per PR
+- **Commit Messages**: Use clear, descriptive commit messages
+
+### Coding Standards
+
+- Follow Laravel best practices
+- Write meaningful variable and function names
+- Add comments for complex logic
+- Keep functions small and focused
+- Use type hints for parameters and return types
+- Validate all user inputs
+- Handle errors gracefully
+
+### Reporting Bugs
+
+When reporting bugs, please include:
+
+- Clear bug description
+- Steps to reproduce
+- Expected behavior
+- Actual behavior
+- PHP and Laravel version
+- Error messages or logs
+
+### Feature Requests
+
+We love new ideas! When requesting features:
+
+- Explain the use case
+- Describe the desired behavior
+- Consider if it fits the project scope
+- Be open to discussion and feedback
+
+## Security
+
+If you discover any security vulnerabilities, please email security@smarttaskboard.com instead of using the issue tracker. All security vulnerabilities will be promptly addressed.
+
+### Security Best Practices
+
+- Always use HTTPS in production
+- Keep dependencies updated
+- Use strong passwords
+- Enable two-factor authentication (coming soon)
+- Regularly backup your database
+- Monitor application logs for suspicious activity
 
 ## License
 
-This project is open-sourced software licensed under the MIT license.
+SmartTaskBoard is open-source software licensed under the [MIT License](LICENSE).
+
+```
+MIT License
+
+Copyright (c) 2024 SmartTaskBoard
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+```
 
 ## Credits
 
-Built with:
-- [Laravel](https://laravel.com)
-- [Tailwind CSS](https://tailwindcss.com)
-- [Alpine.js](https://alpinejs.dev)
-- [SortableJS](https://sortablejs.github.io/Sortable/)
+Developed and maintained by the SmartTaskBoard team.
+
+### Acknowledgments
+
+- Laravel Framework
+- Tailwind CSS
+- Alpine.js
+- SortableJS
+- All open-source contributors
+- Community feedback and support
+
+## Support
+
+- **Documentation**: [https://docs.smarttaskboard.com](https://docs.smarttaskboard.com)
+- **Issues**: [GitHub Issues](https://github.com/yourusername/SmartTaskBoard/issues)
+- **Discussions**: [GitHub Discussions](https://github.com/yourusername/SmartTaskBoard/discussions)
+- **Email**: support@smarttaskboard.com
+
+## Roadmap
+
+- [ ] Real-time notifications
+- [ ] WebSocket support for live updates
+- [ ] File attachments
+- [ ] Task templates
+- [ ] Time tracking
+- [ ] Calendar view
+- [ ] Mobile application
+- [ ] Third-party integrations (Slack, GitHub, etc.)
+- [ ] Advanced reporting and analytics
+- [ ] Custom fields
+- [ ] Automation rules
+- [ ] Two-factor authentication
+
+## Changelog
+
+See [CHANGELOG.md](CHANGELOG.md) for detailed version history.
 
 ---
 
-Made with ❤️ for amazing task management
+Made with care by the SmartTaskBoard team

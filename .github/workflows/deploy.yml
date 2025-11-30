@@ -1,0 +1,247 @@
+name: Deploy
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to deploy to'
+        required: true
+        default: 'production'
+        type: choice
+        options:
+          - production
+          - staging
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: 8.2
+          extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, sqlite, pdo_sqlite, bcmath
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install Composer dependencies
+        run: composer install --prefer-dist --no-interaction --no-dev --optimize-autoloader
+
+      - name: Install NPM dependencies
+        run: npm ci
+
+      - name: Build frontend assets
+        run: npm run build
+
+      - name: Create deployment artifact
+        run: tar -czf artifact.tar.gz --exclude=node_modules --exclude=.git --exclude=tests .
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: deployment-artifact
+          path: artifact.tar.gz
+          retention-days: 5
+
+  docker:
+    runs-on: ubuntu-latest
+    needs: build
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract metadata for Docker
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: |
+            ${{ secrets.DOCKER_USERNAME }}/smarttaskboard
+            ghcr.io/${{ github.repository }}
+          tags: |
+            type=ref,event=branch
+            type=ref,event=pr
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+            type=semver,pattern={{major}}
+            type=sha
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=registry,ref=${{ secrets.DOCKER_USERNAME }}/smarttaskboard:buildcache
+          cache-to: type=registry,ref=${{ secrets.DOCKER_USERNAME }}/smarttaskboard:buildcache,mode=max
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: [build, docker]
+    environment:
+      name: ${{ github.event.inputs.environment || 'production' }}
+      url: ${{ secrets.APP_URL }}
+
+    steps:
+      - name: Download artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: deployment-artifact
+
+      - name: Configure SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          ssh-keyscan -H ${{ secrets.SERVER_HOST }} >> ~/.ssh/known_hosts
+
+      - name: Deploy to server
+        env:
+          SERVER_HOST: ${{ secrets.SERVER_HOST }}
+          SERVER_USER: ${{ secrets.SERVER_USER }}
+          APP_PATH: ${{ secrets.APP_PATH }}
+        run: |
+          scp -i ~/.ssh/deploy_key artifact.tar.gz $SERVER_USER@$SERVER_HOST:$APP_PATH/artifact.tar.gz
+          ssh -i ~/.ssh/deploy_key $SERVER_USER@$SERVER_HOST << 'ENDSSH'
+            cd ${{ secrets.APP_PATH }}
+
+            # Create backup
+            tar -czf backup-$(date +%Y%m%d-%H%M%S).tar.gz \
+              --exclude=storage/logs \
+              --exclude=storage/framework/cache \
+              --exclude=storage/framework/sessions \
+              --exclude=storage/framework/views \
+              --exclude=node_modules \
+              .
+
+            # Extract new version
+            tar -xzf artifact.tar.gz
+            rm artifact.tar.gz
+
+            # Set permissions
+            chown -R www-data:www-data .
+            chmod -R 755 storage bootstrap/cache
+
+            # Run deployment commands
+            php artisan down --render="errors::503" --retry=60
+
+            php artisan config:clear
+            php artisan cache:clear
+            php artisan route:clear
+            php artisan view:clear
+
+            php artisan config:cache
+            php artisan route:cache
+            php artisan view:cache
+
+            # Run migrations
+            php artisan migrate --force
+
+            # Restart services
+            php artisan queue:restart
+            php artisan up
+
+            # Cleanup old backups (keep last 5)
+            ls -t backup-*.tar.gz | tail -n +6 | xargs -r rm
+          ENDSSH
+
+      - name: Health check
+        run: |
+          sleep 10
+          response=$(curl --write-out '%{http_code}' --silent --output /dev/null ${{ secrets.APP_URL }}/health)
+          if [ $response -ne 200 ]; then
+            echo "Health check failed with status code: $response"
+            exit 1
+          fi
+          echo "Health check passed"
+
+      - name: Notify deployment status
+        if: always()
+        uses: 8398a7/action-slack@v3
+        with:
+          status: ${{ job.status }}
+          text: 'Deployment to ${{ github.event.inputs.environment || 'production' }} ${{ job.status }}'
+          webhook_url: ${{ secrets.SLACK_WEBHOOK }}
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}
+
+  rollback:
+    runs-on: ubuntu-latest
+    needs: deploy
+    if: failure()
+    environment:
+      name: ${{ github.event.inputs.environment || 'production' }}
+
+    steps:
+      - name: Configure SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          ssh-keyscan -H ${{ secrets.SERVER_HOST }} >> ~/.ssh/known_hosts
+
+      - name: Rollback deployment
+        env:
+          SERVER_HOST: ${{ secrets.SERVER_HOST }}
+          SERVER_USER: ${{ secrets.SERVER_USER }}
+          APP_PATH: ${{ secrets.APP_PATH }}
+        run: |
+          ssh -i ~/.ssh/deploy_key $SERVER_USER@$SERVER_HOST << 'ENDSSH'
+            cd ${{ secrets.APP_PATH }}
+
+            # Find latest backup
+            latest_backup=$(ls -t backup-*.tar.gz | head -n 1)
+
+            if [ -z "$latest_backup" ]; then
+              echo "No backup found for rollback"
+              exit 1
+            fi
+
+            echo "Rolling back to: $latest_backup"
+
+            # Extract backup
+            tar -xzf $latest_backup
+
+            # Run artisan commands
+            php artisan down
+            php artisan config:clear
+            php artisan cache:clear
+            php artisan migrate:rollback --force
+            php artisan up
+          ENDSSH
+
+      - name: Notify rollback
+        uses: 8398a7/action-slack@v3
+        with:
+          status: 'warning'
+          text: 'Deployment failed. Rolled back to previous version.'
+          webhook_url: ${{ secrets.SLACK_WEBHOOK }}
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}

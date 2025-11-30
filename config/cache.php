@@ -15,7 +15,7 @@ return [
     |
     */
 
-    'default' => env('CACHE_STORE', 'database'),
+    'default' => env('CACHE_STORE', 'redis'),
 
     /*
     |--------------------------------------------------------------------------
@@ -104,5 +104,54 @@ return [
     */
 
     'prefix' => env('CACHE_PREFIX', Str::slug((string) env('APP_NAME', 'laravel')).'-cache-'),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Cache TTL Settings
+    |--------------------------------------------------------------------------
+    |
+    | Define default TTL (Time To Live) values for different types of cached data.
+    | These values are in seconds and can be used throughout the application.
+    |
+    */
+
+    'ttl' => [
+        // Short-lived cache for frequently changing data (5 minutes)
+        'short' => env('CACHE_TTL_SHORT', 300),
+
+        // Medium-lived cache for moderately changing data (1 hour)
+        'medium' => env('CACHE_TTL_MEDIUM', 3600),
+
+        // Long-lived cache for rarely changing data (24 hours)
+        'long' => env('CACHE_TTL_LONG', 86400),
+
+        // Analytics cache (1 hour)
+        'analytics' => env('CACHE_TTL_ANALYTICS', 3600),
+
+        // Query cache (30 minutes)
+        'query' => env('CACHE_TTL_QUERY', 1800),
+
+        // User session cache (2 hours)
+        'session' => env('CACHE_TTL_SESSION', 7200),
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Cache Tags
+    |--------------------------------------------------------------------------
+    |
+    | Define cache tag prefixes for organized cache management.
+    | Tags allow for selective cache invalidation.
+    |
+    */
+
+    'tags' => [
+        'analytics' => 'analytics',
+        'tasks' => 'tasks',
+        'teams' => 'teams',
+        'users' => 'users',
+        'boards' => 'boards',
+        'activity' => 'activity',
+    ],
 
 ];

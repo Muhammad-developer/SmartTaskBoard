@@ -15,6 +15,7 @@ class TaskController extends Controller
             'description' => 'nullable|string',
             'priority' => 'required|in:low,medium,high,urgent',
             'due_date' => 'nullable|date',
+            'assigned_to' => 'nullable|exists:users,id',
             'tags' => 'nullable|array',
             'tags.*' => 'exists:tags,id',
         ]);
@@ -25,6 +26,8 @@ class TaskController extends Controller
             'description' => $validated['description'] ?? null,
             'priority' => $validated['priority'],
             'due_date' => $validated['due_date'] ?? null,
+            'assigned_to' => $validated['assigned_to'] ?? null,
+            'created_by' => auth()->id(),
             'position' => Task::where('column_id', $validated['column_id'])->max('position') + 1,
         ]);
 
@@ -32,7 +35,7 @@ class TaskController extends Controller
             $task->tags()->sync($validated['tags']);
         }
 
-        $task->load('tags');
+        $task->load(['tags', 'assignee', 'creator']);
 
         return response()->json($task, 201);
     }
@@ -44,6 +47,7 @@ class TaskController extends Controller
             'description' => 'nullable|string',
             'priority' => 'sometimes|in:low,medium,high,urgent',
             'due_date' => 'nullable|date',
+            'assigned_to' => 'nullable|exists:users,id',
             'tags' => 'nullable|array',
             'tags.*' => 'exists:tags,id',
         ]);
@@ -54,7 +58,7 @@ class TaskController extends Controller
             $task->tags()->sync($validated['tags']);
         }
 
-        $task->load('tags');
+        $task->load(['tags', 'assignee', 'creator']);
 
         return response()->json($task);
     }

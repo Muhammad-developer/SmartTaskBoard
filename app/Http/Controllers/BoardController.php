@@ -10,12 +10,24 @@ class BoardController extends Controller
 {
     public function index()
     {
-        $boards = Board::all();
-        $board = Board::with(['columns.tasks.tags'])->first();
+        $user = auth()->user();
+
+        // Get boards the user has access to
+        $boards = Board::where('created_by', $user->id)
+            ->orWhereHas('team', function ($query) use ($user) {
+                $query->whereHas('members', function ($q) use ($user) {
+                    $q->where('user_id', $user->id);
+                });
+            })
+            ->with(['columns.tasks.tags', 'creator', 'team'])
+            ->get();
+
+        // Get first board or create default
+        $board = $boards->first();
 
         if (!$board) {
-            $board = $this->createDefaultBoard();
-            $boards = Board::all();
+            $board = $this->createDefaultBoard($user);
+            $boards = collect([$board]);
         }
 
         $tags = Tag::all();
@@ -34,7 +46,18 @@ class BoardController extends Controller
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
             'color' => 'required|string|max:7',
+            'team_id' => 'nullable|exists:teams,id',
         ]);
+
+        $validated['created_by'] = auth()->id();
+
+        // If team_id is provided, check user has access to team
+        if ($validated['team_id'] ?? null) {
+            $team = \App\Models\Team::findOrFail($validated['team_id']);
+            if (!auth()->user()->canAccessTeam($team)) {
+                return response()->json(['error' => 'Unauthorized'], 403);
+            }
+        }
 
         $board = Board::create($validated);
 
@@ -74,12 +97,13 @@ class BoardController extends Controller
         return response()->json($board);
     }
 
-    private function createDefaultBoard()
+    private function createDefaultBoard($user)
     {
         $board = Board::create([
             'name' => 'My Task Board',
             'description' => 'Get things done!',
             'color' => '#0ea5e9',
+            'created_by' => $user->id,
         ]);
 
         $columns = [
