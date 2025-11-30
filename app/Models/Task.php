@@ -18,6 +18,8 @@ class Task extends Model
         'due_date',
         'assigned_to',
         'created_by',
+        'estimated_hours',
+        'time_spent',
     ];
 
     protected $casts = [
@@ -65,5 +67,21 @@ class Task extends Model
     public function attachments(): HasMany
     {
         return $this->hasMany(Attachment::class);
+    }
+
+    /**
+     * Get the checklists for the task.
+     */
+    public function checklists(): HasMany
+    {
+        return $this->hasMany(Checklist::class);
+    }
+
+    /**
+     * Get multiple assignees for the task.
+     */
+    public function assignees(): BelongsToMany
+    {
+        return $this->belongsToMany(User::class, 'task_assignees');
     }
 }

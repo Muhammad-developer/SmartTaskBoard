@@ -94,6 +94,22 @@ const translations = {
         },
 
         language: 'Language',
+
+        task_details: 'Task Details',
+        checklists: 'Checklists',
+        add_checklist: 'Add Checklist',
+        attachments: 'Attachments',
+        comments: 'Comments',
+        assignees: 'Assignees',
+        time_estimate: 'Time Estimate',
+        hours: 'hours',
+        time_spent: 'Time Spent',
+        add_comment: 'Add a comment...',
+        comment: 'Comment',
+        created: 'Created',
+        updated: 'Updated',
+        save_changes: 'Save Changes',
+        delete_task_confirm: 'Are you sure you want to delete this task?',
     },
     ru: {
         boards: 'Доски',
@@ -190,5 +206,21 @@ const translations = {
         },
 
         language: 'Язык',
+
+        task_details: 'Детали задачи',
+        checklists: 'Чек-листы',
+        add_checklist: 'Добавить чек-лист',
+        attachments: 'Вложения',
+        comments: 'Комментарии',
+        assignees: 'Назначенные',
+        time_estimate: 'Оценка времени',
+        hours: 'часов',
+        time_spent: 'Потрачено времени',
+        add_comment: 'Добавить комментарий...',
+        comment: 'Комментарий',
+        created: 'Создано',
+        updated: 'Обновлено',
+        save_changes: 'Сохранить изменения',
+        delete_task_confirm: 'Вы уверены, что хотите удалить эту задачу?',
     }
 };

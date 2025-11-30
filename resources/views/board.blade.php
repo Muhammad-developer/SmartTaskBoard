@@ -951,6 +951,9 @@
         </div>
     </div>
 
+    <!-- Task Details Modal -->
+    @include('components.task-details-modal')
+
     <!-- Loading Overlay -->
     <div x-show="loading"
          x-cloak
@@ -1036,6 +1039,7 @@ function taskBoard() {
         showNewColumnModal: false,
         showEditColumnModal: false,
         showTagsModal: false,
+        showTaskDetailsModal: false,
 
         // Theme & Language
         darkMode: localStorage.getItem('darkMode') === 'true',
@@ -1065,6 +1069,25 @@ function taskBoard() {
             due_date: '',
             tags: []
         },
+        editingTask: {
+            id: null,
+            title: '',
+            description: '',
+            priority: 'medium',
+            due_date: null,
+            column_id: null,
+            estimated_hours: null,
+            time_spent: 0,
+            tags: [],
+            assignees: [],
+            comments: [],
+            attachments: [],
+            checklists: [],
+            created_at: null,
+            updated_at: null
+        },
+        newComment: '',
+        users: @json($users ?? []),
         newTag: {
             name: '',
             color: '#3b82f6'
@@ -1604,6 +1627,204 @@ function taskBoard() {
             } catch (error) {
                 console.error('Error deleting tag:', error);
                 this.showToast('Error deleting tag', 'error');
+            }
+        },
+
+        // Task Details Methods
+        async openTaskDetails(taskId) {
+            try {
+                this.loading = true;
+                const response = await fetch(`/api/tasks/${taskId}/details`);
+                if (response.ok) {
+                    this.editingTask = await response.json();
+                    this.showTaskDetailsModal = true;
+                }
+            } catch (error) {
+                console.error('Error loading task details:', error);
+                this.showToast('Error loading task details', 'error');
+            } finally {
+                this.loading = false;
+            }
+        },
+
+        async saveTaskDetails() {
+            try {
+                this.loading = true;
+                const response = await fetch(`/api/tasks/${this.editingTask.id}/details`, {
+                    method: 'PATCH',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                    },
+                    body: JSON.stringify({
+                        title: this.editingTask.title,
+                        description: this.editingTask.description,
+                        priority: this.editingTask.priority,
+                        due_date: this.editingTask.due_date,
+                        column_id: this.editingTask.column_id,
+                        estimated_hours: this.editingTask.estimated_hours,
+                        time_spent: this.editingTask.time_spent
+                    })
+                });
+
+                if (response.ok) {
+                    this.showToast(this.translate('messages.task_updated'), 'success');
+                    this.showTaskDetailsModal = false;
+                    location.reload();
+                }
+            } catch (error) {
+                console.error('Error saving task:', error);
+                this.showToast('Error saving task', 'error');
+            } finally {
+                this.loading = false;
+            }
+        },
+
+        async addComment() {
+            if (!this.newComment.trim()) return;
+
+            try {
+                const response = await fetch(`/api/tasks/${this.editingTask.id}/comments`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                    },
+                    body: JSON.stringify({ content: this.newComment })
+                });
+
+                if (response.ok) {
+                    const comment = await response.json();
+                    this.editingTask.comments.push(comment);
+                    this.newComment = '';
+                    this.showToast(this.translate('messages.comment_added'), 'success');
+                }
+            } catch (error) {
+                console.error('Error adding comment:', error);
+                this.showToast('Error adding comment', 'error');
+            }
+        },
+
+        async deleteComment(commentId) {
+            if (!confirm('Delete this comment?')) return;
+
+            try {
+                const response = await fetch(`/api/comments/${commentId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                    }
+                });
+
+                if (response.ok) {
+                    this.editingTask.comments = this.editingTask.comments.filter(c => c.id !== commentId);
+                    this.showToast(this.translate('messages.comment_deleted'), 'success');
+                }
+            } catch (error) {
+                console.error('Error deleting comment:', error);
+            }
+        },
+
+        async deleteCurrentTask() {
+            if (!confirm(this.translate('confirm.delete_task'))) return;
+
+            try {
+                const response = await fetch(`/tasks/${this.editingTask.id}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                    }
+                });
+
+                if (response.ok) {
+                    this.showToast(this.translate('messages.task_deleted'), 'success');
+                    this.showTaskDetailsModal = false;
+                    location.reload();
+                }
+            } catch (error) {
+                console.error('Error deleting task:', error);
+                this.showToast('Error deleting task', 'error');
+            }
+        },
+
+        addChecklist() {
+            if (!this.editingTask.checklists) {
+                this.$set(this.editingTask, 'checklists', []);
+            }
+            this.editingTask.checklists.push({ title: '', items: [] });
+        },
+
+        addChecklistItem(checklistIndex) {
+            if (!this.editingTask.checklists[checklistIndex].items) {
+                this.$set(this.editingTask.checklists[checklistIndex], 'items', []);
+            }
+            this.editingTask.checklists[checklistIndex].items.push({ text: '', completed: false });
+        },
+
+        async handleFileUpload(event) {
+            const files = Array.from(event.target.files);
+            for (const file of files) {
+                const formData = new FormData();
+                formData.append('file', file);
+
+                try {
+                    const response = await fetch(`/api/tasks/${this.editingTask.id}/attachments`, {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                        },
+                        body: formData
+                    });
+
+                    if (response.ok) {
+                        const attachment = await response.json();
+                        if (!this.editingTask.attachments) {
+                            this.$set(this.editingTask, 'attachments', []);
+                        }
+                        this.editingTask.attachments.push(attachment);
+                    }
+                } catch (error) {
+                    console.error('Error uploading file:', error);
+                    this.showToast('Error uploading file', 'error');
+                }
+            }
+        },
+
+        async deleteAttachment(attachmentId) {
+            if (!confirm('Delete this attachment?')) return;
+
+            try {
+                const response = await fetch(`/api/attachments/${attachmentId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                    }
+                });
+
+                if (response.ok) {
+                    this.editingTask.attachments = this.editingTask.attachments.filter(a => a.id !== attachmentId);
+                    this.showToast('Attachment deleted', 'success');
+                }
+            } catch (error) {
+                console.error('Error deleting attachment:', error);
+            }
+        },
+
+        toggleAssignee(userId) {
+            const index = this.editingTask.assignees.indexOf(userId);
+            if (index > -1) {
+                this.editingTask.assignees.splice(index, 1);
+            } else {
+                this.editingTask.assignees.push(userId);
+            }
+        },
+
+        toggleTag(tagId) {
+            const index = this.editingTask.tags.indexOf(tagId);
+            if (index > -1) {
+                this.editingTask.tags.splice(index, 1);
+            } else {
+                this.editingTask.tags.push(tagId);
             }
         }
     }

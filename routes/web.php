@@ -3,6 +3,7 @@
 use App\Http\Controllers\BoardController;
 use App\Http\Controllers\ColumnController;
 use App\Http\Controllers\TaskController;
+use App\Http\Controllers\TaskDetailsController;
 use App\Http\Controllers\TagController;
 use App\Http\Controllers\TeamController;
 use App\Http\Controllers\TeamMemberController;
@@ -70,6 +71,28 @@ Route::middleware('auth')->group(function () {
         Route::post('tasks/{task}/move', [TaskController::class, 'move'])->name('tasks.move');
         Route::post('tasks/{task}/reorder', [TaskController::class, 'reorder'])->name('tasks.reorder');
         Route::get('boards/{board}/data', [BoardController::class, 'data'])->name('boards.data');
+
+        // Task Details API routes
+        Route::get('tasks/{task}/details', [TaskDetailsController::class, 'show'])->name('tasks.details.show');
+        Route::patch('tasks/{task}/details', [TaskDetailsController::class, 'update'])->name('tasks.details.update');
+
+        // Comments API routes
+        Route::post('tasks/{task}/comments', [TaskDetailsController::class, 'addComment'])->name('tasks.comments.store');
+        Route::delete('comments/{comment}', [TaskDetailsController::class, 'deleteComment'])->name('tasks.comments.destroy');
+
+        // Attachments API routes
+        Route::post('tasks/{task}/attachments', [TaskDetailsController::class, 'uploadAttachment'])->name('tasks.attachments.store');
+        Route::delete('attachments/{attachment}', [TaskDetailsController::class, 'deleteAttachment'])->name('tasks.attachments.destroy');
+
+        // Checklists API routes
+        Route::post('tasks/{task}/checklists', [TaskDetailsController::class, 'createChecklist'])->name('tasks.checklists.store');
+        Route::post('checklists/{checklist}/items', [TaskDetailsController::class, 'addChecklistItem'])->name('checklists.items.store');
+        Route::patch('checklist-items/{item}', [TaskDetailsController::class, 'updateChecklistItem'])->name('checklists.items.update');
+        Route::delete('checklist-items/{item}', [TaskDetailsController::class, 'deleteChecklistItem'])->name('checklists.items.destroy');
+
+        // Task Assignees API routes
+        Route::post('tasks/{task}/assignees', [TaskDetailsController::class, 'assignUser'])->name('tasks.assignees.store');
+        Route::delete('tasks/{task}/assignees/{user}', [TaskDetailsController::class, 'unassignUser'])->name('tasks.assignees.destroy');
     });
 
     // Locale routes
