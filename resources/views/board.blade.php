@@ -214,66 +214,99 @@
 
                         <template x-for="task in filteredTasks(column.tasks)" :key="task.id">
                             <div :data-task-id="task.id"
-                                 class="rounded-xl shadow-sm hover:shadow-md transition-all duration-200 p-4 mb-3 cursor-move border"
+                                 class="rounded-xl shadow-sm hover:shadow-md transition-all duration-200 overflow-hidden border cursor-move"
                                  :class="[
                                      darkMode ? 'bg-gray-700 border-gray-600 hover:border-gray-500' : 'bg-white border-gray-100 hover:border-gray-200',
                                      isOverdue(task.due_date) ? 'border-l-4 border-l-red-500' : ''
                                  ]">
-                                <!-- Task Priority Badge -->
-                                <div class="flex items-center justify-between mb-2">
-                                    <span class="px-2 py-1 rounded-lg text-xs font-medium"
-                                          :class="{
-                                              'bg-red-100 text-red-700': task.priority === 'urgent',
-                                              'bg-orange-100 text-orange-700': task.priority === 'high',
-                                              'bg-yellow-100 text-yellow-700': task.priority === 'medium',
-                                              'bg-green-100 text-green-700': task.priority === 'low'
-                                          }"
-                                          x-text="translate('priority.' + task.priority).toUpperCase()"></span>
-                                    <div class="flex items-center space-x-1">
-                                        <button @click="openEditTaskModal(task)"
-                                                class="transition-colors"
-                                                :class="darkMode ? 'text-gray-400 hover:text-blue-400' : 'text-gray-400 hover:text-blue-500'">
-                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
-                                            </svg>
-                                        </button>
-                                        <button @click="deleteTask(task.id)"
-                                                class="transition-colors"
-                                                :class="darkMode ? 'text-gray-400 hover:text-red-400' : 'text-gray-400 hover:text-red-500'">
-                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
-                                            </svg>
-                                        </button>
+                                <!-- Cover Image -->
+                                <div x-show="task.cover_image" class="w-full h-24 overflow-hidden bg-gray-200">
+                                    <img :src="`/storage/${task.cover_image}`" alt="Cover" class="w-full h-full object-cover">
+                                </div>
+
+                                <!-- Task Content -->
+                                <div class="p-4">
+                                    <!-- Task Status Badges -->
+                                    <div class="flex items-center justify-between mb-2">
+                                        <div class="flex items-center gap-2">
+                                            <!-- Priority Badge -->
+                                            <span class="px-2 py-1 rounded-lg text-xs font-medium"
+                                                  :class="{
+                                                      'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400': task.priority === 'urgent',
+                                                      'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400': task.priority === 'high',
+                                                      'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400': task.priority === 'medium',
+                                                      'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400': task.priority === 'low'
+                                                  }"
+                                                  x-text="translate('priority.' + task.priority).charAt(0).toUpperCase()"></span>
+
+                                            <!-- Archived Badge -->
+                                            <span x-show="task.archived" class="px-2 py-1 rounded-lg text-xs font-medium bg-gray-400 text-white">📦</span>
+                                        </div>
+                                        <div class="flex items-center space-x-1">
+                                            <button @click="openEditTaskModal(task)"
+                                                    class="transition-colors"
+                                                    :class="darkMode ? 'text-gray-400 hover:text-blue-400' : 'text-gray-400 hover:text-blue-500'">
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                                                </svg>
+                                            </button>
+                                            <button @click="deleteTask(task.id)"
+                                                    class="transition-colors"
+                                                    :class="darkMode ? 'text-gray-400 hover:text-red-400' : 'text-gray-400 hover:text-red-500'">
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                                                </svg>
+                                            </button>
+                                        </div>
                                     </div>
-                                </div>
 
-                                <!-- Task Title -->
-                                <h4 class="font-semibold mb-2 transition-colors cursor-pointer hover:text-blue-500"
-                                    :class="darkMode ? 'text-white' : 'text-gray-900'"
-                                    @click="openEditTaskModal(task)"
-                                    x-text="task.title"></h4>
+                                    <!-- Task Title -->
+                                    <h4 class="font-semibold mb-2 transition-colors cursor-pointer hover:text-blue-500"
+                                        :class="darkMode ? 'text-white' : 'text-gray-900'"
+                                        @click="openEditTaskModal(task)"
+                                        x-text="task.title"></h4>
 
-                                <!-- Task Description -->
-                                <p class="text-sm mb-3 line-clamp-2 transition-colors"
-                                   :class="darkMode ? 'text-gray-300' : 'text-gray-600'"
-                                   x-show="task.description"
-                                   x-text="task.description"></p>
+                                    <!-- Task Description -->
+                                    <p class="text-sm mb-3 line-clamp-2 transition-colors"
+                                       :class="darkMode ? 'text-gray-300' : 'text-gray-600'"
+                                       x-show="task.description"
+                                       x-text="task.description"></p>
 
-                                <!-- Task Tags -->
-                                <div class="flex flex-wrap gap-1 mb-3" x-show="task.tags && task.tags.length > 0">
-                                    <template x-for="tag in task.tags" :key="tag.id">
-                                        <span class="px-2 py-1 rounded-md text-xs font-medium"
-                                              :style="`background-color: ${tag.color}20; color: ${tag.color}`"
-                                              x-text="tag.name"></span>
-                                    </template>
-                                </div>
+                                    <!-- Task Tags -->
+                                    <div class="flex flex-wrap gap-1 mb-3" x-show="task.tags && task.tags.length > 0">
+                                        <template x-for="tag in task.tags" :key="tag.id">
+                                            <span class="px-2 py-1 rounded-md text-xs font-medium"
+                                                  :style="`background-color: ${tag.color}20; color: ${tag.color}`"
+                                                  x-text="tag.name"></span>
+                                        </template>
+                                    </div>
 
-                                <!-- Task Due Date -->
-                                <div class="flex items-center text-xs transition-colors" :class="darkMode ? 'text-gray-400' : 'text-gray-500'" x-show="task.due_date">
-                                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-                                    </svg>
-                                    <span x-text="formatDate(task.due_date)"></span>
+                                    <!-- Task Meta Information -->
+                                    <div class="flex items-center justify-between text-xs transition-colors" :class="darkMode ? 'text-gray-400' : 'text-gray-500'">
+                                        <!-- Due Date -->
+                                        <div class="flex items-center" x-show="task.due_date">
+                                            <svg class="w-3 h-3 mr-1" :class="isOverdue(task.due_date) ? 'text-red-500' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                                            </svg>
+                                            <span :class="isOverdue(task.due_date) ? 'text-red-500 font-semibold' : ''" x-text="formatDate(task.due_date)"></span>
+                                        </div>
+
+                                        <!-- Comments & Attachments Count -->
+                                        <div class="flex items-center gap-2">
+                                            <div x-show="task.comments_count > 0" class="flex items-center gap-1">
+                                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"></path>
+                                                </svg>
+                                                <span x-text="task.comments_count"></span>
+                                            </div>
+                                            <div x-show="task.attachments_count > 0" class="flex items-center gap-1">
+                                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486l6.414-6.585"></path>
+                                                </svg>
+                                                <span x-text="task.attachments_count"></span>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </template>

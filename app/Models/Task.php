@@ -32,6 +32,8 @@ class Task extends Model
         'archived_at' => 'datetime',
     ];
 
+    protected $appends = ['comments_count', 'attachments_count'];
+
     public function column(): BelongsTo
     {
         return $this->belongsTo(Column::class);
@@ -88,5 +90,21 @@ class Task extends Model
     public function assignees(): BelongsToMany
     {
         return $this->belongsToMany(User::class, 'task_assignees');
+    }
+
+    /**
+     * Get comments count
+     */
+    public function getCommentsCountAttribute()
+    {
+        return $this->comments()->count();
+    }
+
+    /**
+     * Get attachments count
+     */
+    public function getAttachmentsCountAttribute()
+    {
+        return $this->attachments()->count();
     }
 }
