@@ -518,10 +518,38 @@
                 <template x-for="b in boards" :key="b.id">
                     <div class="p-3 rounded-lg mb-2 flex justify-between items-center transition-colors"
                          :class="darkMode ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-50 hover:bg-gray-100'">
-                        <a :href="`/boards/${b.id}`" class="flex-1 transition-colors" :class="darkMode ? 'text-white' : 'text-gray-900'" x-text="b.name"></a>
-                        <span x-show="b.id === board.id" class="px-2 py-1 bg-blue-500 text-white text-xs rounded-lg">Active</span>
+                        <div class="flex-1 flex items-center space-x-3">
+                            <a :href="`/boards/${b.id}`" class="flex-1 transition-colors" :class="darkMode ? 'text-white' : 'text-gray-900'" x-text="b.name"></a>
+                            <span x-show="b.id === board.id" class="px-2 py-1 bg-blue-500 text-white text-xs rounded-lg font-medium">Active</span>
+                        </div>
+                        <div class="flex items-center space-x-2" x-show="b.id !== board.id">
+                            <button @click="openEditBoardModal(b)"
+                                    class="p-2 rounded transition-colors"
+                                    :class="darkMode ? 'text-gray-400 hover:text-blue-400' : 'text-gray-500 hover:text-blue-500'"
+                                    title="Edit board">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                                </svg>
+                            </button>
+                            <button @click="deleteBoard(b.id)"
+                                    class="p-2 rounded transition-colors"
+                                    :class="darkMode ? 'text-gray-400 hover:text-red-400' : 'text-gray-500 hover:text-red-500'"
+                                    title="Delete board">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                                </svg>
+                            </button>
+                        </div>
                     </div>
                 </template>
+                <!-- Empty State -->
+                <div x-show="boards.length === 0"
+                     class="text-center py-8 opacity-50">
+                    <svg class="w-12 h-12 mx-auto mb-3" :class="darkMode ? 'text-gray-600' : 'text-gray-400'" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                    </svg>
+                    <p class="text-sm transition-colors" :class="darkMode ? 'text-gray-400' : 'text-gray-500'" x-text="translate('no_boards')"></p>
+                </div>
             </div>
 
             <button @click="showNewBoardModal = true; showBoardModal = false"
@@ -567,6 +595,48 @@
                     <button type="submit"
                             class="flex-1 px-4 py-2 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-xl hover:shadow-lg transition-all font-medium"
                             x-text="translate('actions.create')"></button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Edit Board Modal -->
+    <div x-show="showEditBoardModal"
+         x-cloak
+         @click.self="showEditBoardModal = false"
+         class="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+        <div class="rounded-2xl shadow-2xl max-w-lg w-full p-6 transition-colors"
+             :class="darkMode ? 'bg-gray-800' : 'bg-white'"
+             @click.stop>
+            <h2 class="text-2xl font-bold mb-6 transition-colors" :class="darkMode ? 'text-white' : 'text-gray-900'" x-text="translate('edit_board')"></h2>
+
+            <form @submit.prevent="updateBoard()">
+                <div class="mb-4">
+                    <label class="block text-sm font-medium mb-2 transition-colors" :class="darkMode ? 'text-gray-300' : 'text-gray-700'" x-text="translate('board_name')"></label>
+                    <input type="text"
+                           x-model="editBoard.name"
+                           required
+                           class="w-full px-4 py-2 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+                           :class="darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300 text-gray-900'">
+                </div>
+
+                <div class="mb-6">
+                    <label class="block text-sm font-medium mb-2 transition-colors" :class="darkMode ? 'text-gray-300' : 'text-gray-700'" x-text="translate('board_description')"></label>
+                    <textarea x-model="editBoard.description"
+                              rows="3"
+                              class="w-full px-4 py-2 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+                              :class="darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300 text-gray-900'"></textarea>
+                </div>
+
+                <div class="flex space-x-3">
+                    <button type="button"
+                            @click="showEditBoardModal = false"
+                            class="flex-1 px-4 py-2 border rounded-xl transition-colors"
+                            :class="darkMode ? 'border-gray-600 text-gray-300 hover:bg-gray-700' : 'border-gray-300 text-gray-700 hover:bg-gray-50'"
+                            x-text="translate('actions.cancel')"></button>
+                    <button type="submit"
+                            class="flex-1 px-4 py-2 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-xl hover:shadow-lg transition-all font-medium"
+                            x-text="translate('actions.save')"></button>
                 </div>
             </form>
         </div>
@@ -769,6 +839,7 @@ function taskBoard() {
         showEditTaskModal: false,
         showBoardModal: false,
         showNewBoardModal: false,
+        showEditBoardModal: false,
         showNewColumnModal: false,
         showEditColumnModal: false,
         showTagsModal: false,
@@ -806,6 +877,12 @@ function taskBoard() {
             color: '#3b82f6'
         },
         newBoard: {
+            name: '',
+            description: '',
+            color: '#0ea5e9'
+        },
+        editBoard: {
+            id: null,
             name: '',
             description: '',
             color: '#0ea5e9'
@@ -867,6 +944,7 @@ function taskBoard() {
                     this.showEditTaskModal = false;
                     this.showBoardModal = false;
                     this.showNewBoardModal = false;
+                    this.showEditBoardModal = false;
                     this.showNewColumnModal = false;
                     this.showEditColumnModal = false;
                     this.showTagsModal = false;
@@ -999,6 +1077,66 @@ function taskBoard() {
                 }
             } catch (error) {
                 console.error('Error creating board:', error);
+            }
+        },
+
+        openEditBoardModal(board) {
+            this.editBoard = {
+                id: board.id,
+                name: board.name,
+                description: board.description,
+                color: board.color
+            };
+            this.showEditBoardModal = true;
+        },
+
+        async updateBoard() {
+            try {
+                this.loading = true;
+                const response = await fetch(`/boards/${this.editBoard.id}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                    },
+                    body: JSON.stringify({
+                        name: this.editBoard.name,
+                        description: this.editBoard.description,
+                        color: this.editBoard.color
+                    })
+                });
+
+                if (response.ok) {
+                    this.updateBoardData();
+                    this.showEditBoardModal = false;
+                    await fetch(`/api/boards/${this.board.id}/data`);
+                    location.reload();
+                }
+            } catch (error) {
+                console.error('Error updating board:', error);
+                this.showToast('Error updating board', 'error');
+            } finally {
+                this.loading = false;
+            }
+        },
+
+        async deleteBoard(boardId) {
+            if (!confirm(this.translate('confirm.delete_board'))) return;
+
+            try {
+                const response = await fetch(`/boards/${boardId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                    }
+                });
+
+                if (response.ok) {
+                    window.location.href = '/';
+                }
+            } catch (error) {
+                console.error('Error deleting board:', error);
+                this.showToast('Error deleting board', 'error');
             }
         },
 
