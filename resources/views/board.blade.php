@@ -810,77 +810,144 @@
         </div>
     </div>
 
-    <!-- Tags Management Modal -->
+    <!-- Tags Management Modal - Enhanced -->
     <div x-show="showTagsModal"
          x-cloak
          @click.self="showTagsModal = false"
          class="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-        <div class="rounded-2xl shadow-2xl max-w-lg w-full p-6 transition-colors"
+        <div class="rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto transition-colors"
              :class="darkMode ? 'bg-gray-800' : 'bg-white'"
              @click.stop>
-            <h2 class="text-2xl font-bold mb-6 transition-colors" :class="darkMode ? 'text-white' : 'text-gray-900'" x-text="translate('manage_tags')"></h2>
-
-            <!-- Tags List -->
-            <div class="mb-6 max-h-64 overflow-y-auto">
-                <template x-for="tag in tags" :key="tag.id">
-                    <div class="p-3 rounded-lg mb-2 flex justify-between items-center transition-colors"
-                         :class="darkMode ? 'bg-gray-700' : 'bg-gray-50'">
-                        <div class="flex items-center space-x-3">
-                            <div class="w-4 h-4 rounded-full" :style="`background-color: ${tag.color}`"></div>
-                            <span class="transition-colors" :class="darkMode ? 'text-white' : 'text-gray-900'" x-text="tag.name"></span>
-                        </div>
-                        <button @click="deleteTag(tag.id)"
-                                class="transition-colors"
-                                :class="darkMode ? 'text-gray-400 hover:text-red-400' : 'text-gray-500 hover:text-red-500'">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
-                            </svg>
-                        </button>
-                    </div>
-                </template>
-
-                <!-- Empty State for Tags -->
-                <div x-show="tags.length === 0"
-                     class="text-center py-8">
-                    <svg class="w-12 h-12 mx-auto mb-3 opacity-30" :class="darkMode ? 'text-gray-600' : 'text-gray-400'" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path>
-                    </svg>
-                    <p class="text-sm opacity-50" :class="darkMode ? 'text-gray-400' : 'text-gray-500'" x-text="translate('no_tags')"></p>
+            <!-- Header -->
+            <div class="sticky top-0 flex items-center justify-between p-6 border-b transition-colors"
+                 :class="darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'">
+                <div>
+                    <h2 class="text-2xl font-bold transition-colors" :class="darkMode ? 'text-white' : 'text-gray-900'" x-text="translate('manage_tags')"></h2>
+                    <p class="text-sm transition-colors" :class="darkMode ? 'text-gray-400' : 'text-gray-600'">Create and manage tags for better organization</p>
                 </div>
+                <button @click="showTagsModal = false"
+                        class="p-2 rounded-lg transition-colors"
+                        :class="darkMode ? 'hover:bg-gray-700 text-gray-400' : 'hover:bg-gray-100 text-gray-500'">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
             </div>
 
-            <!-- Create New Tag Form -->
-            <form @submit.prevent="createTag()" class="border-t pt-4" :class="darkMode ? 'border-gray-700' : 'border-gray-200'">
-                <h3 class="text-lg font-semibold mb-4 transition-colors" :class="darkMode ? 'text-white' : 'text-gray-900'" x-text="translate('new_tag')"></h3>
+            <div class="grid grid-cols-1 lg:grid-cols-2 divide-y lg:divide-y-0 lg:divide-x transition-colors"
+                 :class="darkMode ? 'divide-gray-700' : 'divide-gray-200'">
+                <!-- LEFT: Existing Tags List -->
+                <div class="p-6 space-y-4">
+                    <h3 class="text-lg font-bold transition-colors uppercase tracking-wide"
+                        :class="darkMode ? 'text-gray-300' : 'text-gray-700'">Existing Tags</h3>
 
-                <div class="mb-4">
-                    <label class="block text-sm font-medium mb-2 transition-colors" :class="darkMode ? 'text-gray-300' : 'text-gray-700'" x-text="translate('tag_name')"></label>
-                    <input type="text"
-                           x-model="newTag.name"
-                           required
-                           class="w-full px-4 py-2 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
-                           :class="darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300 text-gray-900'">
+                    <!-- Tags Grid -->
+                    <div class="max-h-96 overflow-y-auto space-y-2">
+                        <template x-for="tag in tags" :key="tag.id">
+                            <div class="p-4 rounded-lg flex items-center justify-between transition-all hover:shadow-md"
+                                 :style="`background-color: ${tag.color}15; border: 2px solid ${tag.color}30`"
+                                 :class="darkMode ? 'hover:bg-gray-700' : ''">
+                                <div class="flex items-center space-x-3 flex-1">
+                                    <div class="w-6 h-6 rounded-full shadow-sm" :style="`background-color: ${tag.color}`"></div>
+                                    <div>
+                                        <p class="font-semibold transition-colors" :class="darkMode ? 'text-white' : 'text-gray-900'" x-text="tag.name"></p>
+                                        <p class="text-xs transition-colors" :class="darkMode ? 'text-gray-500' : 'text-gray-600'" x-text="`Color: ${tag.color}`"></p>
+                                    </div>
+                                </div>
+                                <button @click="deleteTag(tag.id)"
+                                        class="p-2 rounded-lg transition-colors ml-2"
+                                        :class="darkMode ? 'hover:bg-red-500/20 text-red-400 hover:text-red-300' : 'hover:bg-red-50 text-red-600 hover:text-red-700'"
+                                        title="Delete tag">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                                    </svg>
+                                </button>
+                            </div>
+                        </template>
+
+                        <!-- Empty State for Tags -->
+                        <div x-show="tags.length === 0"
+                             class="text-center py-12">
+                            <svg class="w-16 h-16 mx-auto mb-4 opacity-30" :class="darkMode ? 'text-gray-600' : 'text-gray-400'" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path>
+                            </svg>
+                            <p class="text-sm opacity-60 transition-colors" :class="darkMode ? 'text-gray-400' : 'text-gray-600'">No tags yet. Create one to get started!</p>
+                        </div>
+                    </div>
                 </div>
 
-                <div class="mb-4">
-                    <label class="block text-sm font-medium mb-2 transition-colors" :class="darkMode ? 'text-gray-300' : 'text-gray-700'" x-text="translate('tag_color')"></label>
-                    <input type="color"
-                           x-model="newTag.color"
-                           required
-                           class="w-full h-12 rounded-xl cursor-pointer">
-                </div>
+                <!-- RIGHT: Create New Tag Form -->
+                <div class="p-6 space-y-6" :class="darkMode ? 'bg-gray-750' : 'bg-gray-50'">
+                    <div>
+                        <h3 class="text-lg font-bold transition-colors uppercase tracking-wide"
+                            :class="darkMode ? 'text-gray-300' : 'text-gray-700'">Create Tag</h3>
+                        <p class="text-sm transition-colors" :class="darkMode ? 'text-gray-500' : 'text-gray-600'">Add a new tag to your organization</p>
+                    </div>
 
-                <div class="flex space-x-3">
-                    <button type="button"
-                            @click="showTagsModal = false"
-                            class="flex-1 px-4 py-2 border rounded-xl transition-colors"
-                            :class="darkMode ? 'border-gray-600 text-gray-300 hover:bg-gray-700' : 'border-gray-300 text-gray-700 hover:bg-gray-50'"
-                            x-text="translate('actions.cancel')"></button>
-                    <button type="submit"
-                            class="flex-1 px-4 py-2 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-xl hover:shadow-lg transition-all font-medium"
-                            x-text="translate('create_tag')"></button>
+                    <form @submit.prevent="createTag()" class="space-y-5">
+                        <!-- Tag Name -->
+                        <div>
+                            <label class="block text-sm font-semibold mb-2 transition-colors" :class="darkMode ? 'text-gray-300' : 'text-gray-700'">Tag Name</label>
+                            <input type="text"
+                                   x-model="newTag.name"
+                                   placeholder="e.g., Feature, Bug, Enhancement"
+                                   required
+                                   class="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+                                   :class="darkMode ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-500' : 'bg-white border-gray-300 text-gray-900 placeholder-gray-400'">
+                        </div>
+
+                        <!-- Color Picker with Preview -->
+                        <div>
+                            <label class="block text-sm font-semibold mb-3 transition-colors" :class="darkMode ? 'text-gray-300' : 'text-gray-700'">Choose Color</label>
+                            <div class="flex items-end gap-4">
+                                <div class="flex-1">
+                                    <input type="color"
+                                           x-model="newTag.color"
+                                           required
+                                           class="w-full h-14 rounded-lg cursor-pointer border-2 transition-colors"
+                                           :class="darkMode ? 'border-gray-600' : 'border-gray-300'">
+                                </div>
+                                <!-- Color Preview -->
+                                <div class="px-4 py-3 rounded-lg font-semibold text-white transition-all shadow-md"
+                                     :style="`background-color: ${newTag.color}`"
+                                     x-text="newTag.name || 'Preview'"></div>
+                            </div>
+                            <p class="text-xs mt-2 transition-colors" :class="darkMode ? 'text-gray-500' : 'text-gray-600'" x-text="`Selected: ${newTag.color}`"></p>
+                        </div>
+
+                        <!-- Color Palette Shortcuts -->
+                        <div>
+                            <label class="block text-xs font-semibold mb-2 transition-colors uppercase tracking-wide" :class="darkMode ? 'text-gray-500' : 'text-gray-600'">Quick Colors</label>
+                            <div class="grid grid-cols-6 gap-2">
+                                <template x-for="color in ['#ef4444', '#f59e0b', '#10b981', '#3b82f6', '#8b5cf6', '#ec4899', '#14b8a6', '#f97316', '#06b6d4', '#6366f1', '#84cc16', '#f43f5e']" :key="color">
+                                    <button type="button"
+                                            @click="newTag.color = color"
+                                            :style="`background-color: ${color}`"
+                                            :class="{'ring-2 ring-white': newTag.color === color}"
+                                            class="w-full h-10 rounded-lg transition-all hover:scale-110 cursor-pointer shadow-md"></button>
+                                </template>
+                            </div>
+                        </div>
+
+                        <!-- Buttons -->
+                        <div class="flex gap-3 pt-4 border-t" :class="darkMode ? 'border-gray-700' : 'border-gray-200'">
+                            <button type="button"
+                                    @click="showTagsModal = false"
+                                    class="flex-1 px-4 py-3 border rounded-lg font-medium transition-colors"
+                                    :class="darkMode ? 'border-gray-600 text-gray-300 hover:bg-gray-700' : 'border-gray-300 text-gray-700 hover:bg-gray-50'">
+                                Close
+                            </button>
+                            <button type="submit"
+                                    class="flex-1 px-4 py-3 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-lg hover:shadow-lg transition-all font-bold flex items-center justify-center gap-2">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                                </svg>
+                                <span x-text="translate('create_tag')"></span>
+                            </button>
+                        </div>
+                    </form>
                 </div>
-            </form>
+            </div>
         </div>
     </div>
 
