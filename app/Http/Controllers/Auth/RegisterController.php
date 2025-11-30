@@ -22,15 +22,18 @@ class RegisterController extends Controller
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
             'password' => ['required', 'confirmed', Password::defaults()],
+            'locale' => ['required', 'in:en,ru'],
         ]);
 
         $user = User::create([
             'name' => $validated['name'],
             'email' => $validated['email'],
             'password' => Hash::make($validated['password']),
+            'locale' => $validated['locale'],
         ]);
 
         Auth::login($user);
+        $request->session()->put('locale', $user->locale);
 
         return redirect()->route('dashboard')->with('success', 'Registration successful! Welcome to SmartTaskBoard.');
     }

@@ -78,6 +78,7 @@ class DatabaseSeeder extends Seeder
             'password' => Hash::make('password'),
             'bio' => 'System Administrator',
             'last_active_at' => now(),
+            'locale' => 'en',
         ]);
 
         // Create team members
@@ -103,6 +104,7 @@ class DatabaseSeeder extends Seeder
                 'password' => Hash::make('password'),
                 'bio' => 'Team member - ' . $name,
                 'last_active_at' => rand(0, 1) ? now()->subDays(rand(0, 7)) : now(),
+                'locale' => rand(0, 1) ? 'en' : 'ru',  // Randomly assign English or Russian
             ]);
         }
 

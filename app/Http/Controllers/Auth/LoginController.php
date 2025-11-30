@@ -22,6 +22,8 @@ class LoginController extends Controller
 
         if (Auth::attempt($credentials, $request->boolean('remember'))) {
             $request->session()->regenerate();
+            // Set user's locale in session
+            $request->session()->put('locale', auth()->user()->locale);
             return redirect()->intended('/');
         }
 

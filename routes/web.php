@@ -13,6 +13,7 @@ use App\Http\Controllers\CommentController;
 use App\Http\Controllers\AttachmentController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\ExportController;
+use App\Http\Controllers\LocaleController;
 use Illuminate\Support\Facades\Route;
 
 // Authentication Routes
@@ -70,4 +71,10 @@ Route::middleware('auth')->group(function () {
         Route::post('tasks/{task}/reorder', [TaskController::class, 'reorder'])->name('tasks.reorder');
         Route::get('boards/{board}/data', [BoardController::class, 'data'])->name('boards.data');
     });
+
+    // Locale routes
+    Route::post('/locale/{locale}', [LocaleController::class, 'change'])->name('locale.change');
 });
+
+// Locale routes for guests (before login)
+Route::post('/locale/{locale}', [LocaleController::class, 'change'])->name('locale.change');
