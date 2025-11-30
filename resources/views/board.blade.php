@@ -20,6 +20,41 @@
                         </div>
                     </div>
                     <div class="flex items-center space-x-3">
+                        <!-- View Selector -->
+                        <div class="flex items-center border rounded-xl transition-colors"
+                             :class="darkMode ? 'border-gray-700 bg-gray-700' : 'border-gray-300 bg-white'">
+                            <button @click="setViewMode('kanban')"
+                                    class="px-3 py-2 transition-colors"
+                                    :class="viewMode === 'kanban' ? (darkMode ? 'bg-gray-600 text-white' : 'bg-blue-100 text-blue-700') : (darkMode ? 'text-gray-400 hover:text-white' : 'text-gray-600 hover:text-gray-900')"
+                                    title="Kanban View">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7m0 10a2 2 0 002 2h2a2 2 0 002-2V7a2 2 0 00-2-2h-2a2 2 0 00-2 2"></path>
+                                </svg>
+                            </button>
+                            <button @click="setViewMode('table')"
+                                    class="px-3 py-2 transition-colors border-l"
+                                    :class="[
+                                        darkMode ? 'border-gray-600' : 'border-gray-300',
+                                        viewMode === 'table' ? (darkMode ? 'bg-gray-600 text-white' : 'bg-blue-100 text-blue-700') : (darkMode ? 'text-gray-400 hover:text-white' : 'text-gray-600 hover:text-gray-900')
+                                    ]"
+                                    title="Table View">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M3 14h18m-9-4v8m-7 0h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+                                </svg>
+                            </button>
+                            <button @click="setViewMode('calendar')"
+                                    class="px-3 py-2 transition-colors border-l"
+                                    :class="[
+                                        darkMode ? 'border-gray-600' : 'border-gray-300',
+                                        viewMode === 'calendar' ? (darkMode ? 'bg-gray-600 text-white' : 'bg-blue-100 text-blue-700') : (darkMode ? 'text-gray-400 hover:text-white' : 'text-gray-600 hover:text-gray-900')
+                                    ]"
+                                    title="Calendar View">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                                </svg>
+                            </button>
+                        </div>
+
                         <!-- Board Selector -->
                         <button @click="showBoardModal = true"
                                 class="px-4 py-2 rounded-xl transition-all duration-200 flex items-center space-x-2"
@@ -137,6 +172,16 @@
                             </div>
                         </div>
                     </div>
+
+                    <!-- Show/Hide Archived -->
+                    <button @click="toggleArchivedTasks()"
+                            class="px-4 py-2 rounded-xl transition-all duration-200 flex items-center space-x-2"
+                            :class="showArchivedTasks ? (darkMode ? 'bg-gray-600 text-white' : 'bg-blue-100 text-blue-700') : (darkMode ? 'bg-gray-700 text-gray-300 hover:bg-gray-600' : 'bg-gray-100 text-gray-700 hover:bg-gray-200')">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>
+                        </svg>
+                        <span x-text="showArchivedTasks ? 'Hide Archived' : 'Show Archived'"></span>
+                    </button>
 
                     <!-- Clear Filters -->
                     <button @click="clearFilters()"
@@ -1078,11 +1123,15 @@ function taskBoard() {
         darkMode: localStorage.getItem('darkMode') === 'true',
         locale: localStorage.getItem('locale') || 'en',
 
+        // View Mode
+        viewMode: localStorage.getItem('viewMode') || 'kanban',
+
         // UI States
         loading: false,
         searchQuery: '',
         filterPriority: '',
         filterTags: [],
+        showArchivedTasks: false,
 
         // Forms
         newTask: {
@@ -1228,6 +1277,15 @@ function taskBoard() {
         toggleLanguage() {
             this.locale = this.locale === 'en' ? 'ru' : 'en';
             localStorage.setItem('locale', this.locale);
+        },
+
+        setViewMode(mode) {
+            this.viewMode = mode;
+            localStorage.setItem('viewMode', mode);
+        },
+
+        toggleArchivedTasks() {
+            this.showArchivedTasks = !this.showArchivedTasks;
         },
 
         initializeSortable() {
