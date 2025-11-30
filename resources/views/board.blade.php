@@ -463,107 +463,170 @@
         </div>
     </div>
 
-    <!-- Edit Task Modal -->
+    <!-- Edit Task Modal - Enhanced Trello-like Interface -->
     <div x-show="showEditTaskModal"
          x-cloak
          @click.self="showEditTaskModal = false"
          class="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-        <div class="rounded-2xl shadow-2xl max-w-lg w-full p-6 transition-colors"
+        <div class="rounded-2xl shadow-2xl max-w-4xl w-full h-auto max-h-[90vh] overflow-y-auto transition-colors"
              :class="darkMode ? 'bg-gray-800' : 'bg-white'"
              @click.stop>
-            <h2 class="text-2xl font-bold mb-6 transition-colors" :class="darkMode ? 'text-white' : 'text-gray-900'" x-text="translate('edit_task')"></h2>
-
-            <form @submit.prevent="updateTask()">
-                <!-- Column Selection -->
-                <div class="mb-4">
-                    <label class="block text-sm font-medium mb-2 transition-colors" :class="darkMode ? 'text-gray-300' : 'text-gray-700'" x-text="translate('column')"></label>
-                    <select x-model="editTask.column_id"
-                            required
-                            class="w-full px-4 py-2 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
-                            :class="darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300 text-gray-900'">
-                        <template x-for="column in board.columns" :key="column.id">
-                            <option :value="column.id" x-text="column.name"></option>
-                        </template>
-                    </select>
+            <!-- Header with Close Button -->
+            <div class="sticky top-0 flex items-center justify-between p-6 border-b transition-colors"
+                 :class="darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'">
+                <div>
+                    <h2 class="text-2xl font-bold transition-colors" :class="darkMode ? 'text-white' : 'text-gray-900'" x-text="translate('edit_task')"></h2>
+                    <p class="text-sm transition-colors" :class="darkMode ? 'text-gray-400' : 'text-gray-600'">Update task details and properties</p>
                 </div>
+                <button @click="showEditTaskModal = false"
+                        class="p-2 rounded-lg transition-colors"
+                        :class="darkMode ? 'hover:bg-gray-700 text-gray-400' : 'hover:bg-gray-100 text-gray-500'">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
 
-                <!-- Task Title -->
-                <div class="mb-4">
-                    <label class="block text-sm font-medium mb-2 transition-colors" :class="darkMode ? 'text-gray-300' : 'text-gray-700'" x-text="translate('task_title')"></label>
-                    <input type="text"
-                           x-model="editTask.title"
-                           required
-                           class="w-full px-4 py-2 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
-                           :class="darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300 text-gray-900'"
-                           :placeholder="translate('enter_task_title')">
-                </div>
+            <!-- Main Content - Two Column Layout -->
+            <form @submit.prevent="updateTask()" class="grid grid-cols-1 lg:grid-cols-3 divide-y lg:divide-y-0 lg:divide-x transition-colors"
+                  :class="darkMode ? 'divide-gray-700' : 'divide-gray-200'">
 
-                <!-- Task Description -->
-                <div class="mb-4">
-                    <label class="block text-sm font-medium mb-2 transition-colors" :class="darkMode ? 'text-gray-300' : 'text-gray-700'" x-text="translate('task_description')"></label>
-                    <textarea x-model="editTask.description"
-                              rows="3"
-                              class="w-full px-4 py-2 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
-                              :class="darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300 text-gray-900'"
-                              :placeholder="translate('enter_task_description')"></textarea>
-                </div>
+                <!-- LEFT COLUMN: Main Task Details -->
+                <div class="lg:col-span-2 p-6 space-y-5">
+                    <!-- Task Title Input -->
+                    <div>
+                        <label class="block text-xs font-semibold mb-2 transition-colors uppercase tracking-wide"
+                               :class="darkMode ? 'text-gray-400' : 'text-gray-600'">
+                            <svg class="w-4 h-4 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                            </svg>
+                            Task Title
+                        </label>
+                        <input type="text"
+                               x-model="editTask.title"
+                               required
+                               placeholder="Enter a descriptive title for your task"
+                               class="w-full px-4 py-3 text-lg font-semibold border-0 border-b-2 focus:border-blue-500 focus:outline-none transition-colors bg-transparent"
+                               :class="darkMode ? 'border-gray-600 text-white placeholder-gray-500' : 'border-gray-300 text-gray-900 placeholder-gray-400'">
+                    </div>
 
-                <!-- Priority -->
-                <div class="mb-4">
-                    <label class="block text-sm font-medium mb-2 transition-colors" :class="darkMode ? 'text-gray-300' : 'text-gray-700'" x-text="translate('task_priority')"></label>
-                    <select x-model="editTask.priority"
-                            class="w-full px-4 py-2 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
-                            :class="darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300 text-gray-900'">
-                        <option value="low" x-text="translate('priority.low')"></option>
-                        <option value="medium" x-text="translate('priority.medium')"></option>
-                        <option value="high" x-text="translate('priority.high')"></option>
-                        <option value="urgent" x-text="translate('priority.urgent')"></option>
-                    </select>
-                </div>
+                    <!-- Task Description -->
+                    <div>
+                        <label class="block text-xs font-semibold mb-2 transition-colors uppercase tracking-wide"
+                               :class="darkMode ? 'text-gray-400' : 'text-gray-600'">
+                            <svg class="w-4 h-4 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
+                            </svg>
+                            Description
+                        </label>
+                        <textarea x-model="editTask.description"
+                                  rows="6"
+                                  placeholder="Add a detailed description of your task."
+                                  class="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors resize-none"
+                                  :class="darkMode ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-500' : 'bg-gray-50 border-gray-300 text-gray-900 placeholder-gray-400'"></textarea>
+                    </div>
 
-                <!-- Due Date -->
-                <div class="mb-6">
-                    <label class="block text-sm font-medium mb-2 transition-colors" :class="darkMode ? 'text-gray-300' : 'text-gray-700'" x-text="translate('task_due_date')"></label>
-                    <input type="date"
-                           x-model="editTask.due_date"
-                           class="w-full px-4 py-2 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
-                           :class="darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300 text-gray-900'">
-                </div>
-
-                <!-- Tags Selection -->
-                <div class="mb-6">
-                    <label class="block text-sm font-medium mb-3 transition-colors" :class="darkMode ? 'text-gray-300' : 'text-gray-700'" x-text="translate('tags')"></label>
-                    <div class="grid grid-cols-3 gap-2 max-h-48 overflow-y-auto p-2 border rounded-xl transition-colors"
-                         :class="darkMode ? 'bg-gray-700 border-gray-600' : 'bg-gray-50 border-gray-300'">
-                        <template x-for="tag in tags" :key="tag.id">
-                            <label class="flex items-center space-x-2 p-2 hover:bg-gray-100 rounded cursor-pointer transition-colors"
-                                   :class="darkMode ? 'hover:bg-gray-600' : ''">
-                                <input type="checkbox"
-                                       x-model="editTask.tags"
-                                       :value="tag.id"
-                                       class="w-4 h-4 text-blue-600 rounded focus:ring-blue-500 focus:ring-2">
-                                <span class="text-xs font-medium px-2 py-1 rounded text-white"
-                                      :style="`background-color: ${tag.color}`"
-                                      x-text="tag.name"></span>
-                            </label>
-                        </template>
-                        <div x-show="tags.length === 0" class="col-span-3 text-center py-4 text-sm opacity-50 transition-colors"
-                             :class="darkMode ? 'text-gray-400' : 'text-gray-500'" x-text="translate('no_tags')"></div>
+                    <!-- Column Selection - Large Select -->
+                    <div>
+                        <label class="block text-xs font-semibold mb-2 transition-colors uppercase tracking-wide"
+                               :class="darkMode ? 'text-gray-400' : 'text-gray-600'">
+                            <svg class="w-4 h-4 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2m0 0V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2m0 0V7a2 2 0 00-2-2h-2a2 2 0 00-2 2"></path>
+                            </svg>
+                            Select Column
+                        </label>
+                        <select x-model="editTask.column_id"
+                                required
+                                class="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors font-medium"
+                                :class="darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300 text-gray-900'">
+                            <template x-for="column in board.columns" :key="column.id">
+                                <option :value="column.id" x-text="column.name"></option>
+                            </template>
+                        </select>
                     </div>
                 </div>
 
-                <!-- Buttons -->
-                <div class="flex space-x-3">
-                    <button type="button"
-                            @click="showEditTaskModal = false"
-                            class="flex-1 px-4 py-2 border rounded-xl transition-colors"
-                            :class="darkMode ? 'border-gray-600 text-gray-300 hover:bg-gray-700' : 'border-gray-300 text-gray-700 hover:bg-gray-50'"
-                            x-text="translate('actions.cancel')"></button>
-                    <button type="submit"
-                            class="flex-1 px-4 py-2 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-xl hover:shadow-lg transition-all font-medium"
-                            x-text="translate('actions.save')"></button>
+                <!-- RIGHT COLUMN: Properties Sidebar -->
+                <div class="lg:col-span-1 p-6 space-y-4" :class="darkMode ? 'bg-gray-750' : 'bg-gray-50'">
+                    <h3 class="text-sm font-bold transition-colors uppercase tracking-widest"
+                        :class="darkMode ? 'text-gray-400' : 'text-gray-700'">
+                        Task Details
+                    </h3>
+
+                    <!-- Priority -->
+                    <div>
+                        <label class="block text-xs font-semibold mb-2 transition-colors" :class="darkMode ? 'text-gray-400' : 'text-gray-600'">Priority</label>
+                        <div class="grid grid-cols-2 gap-2">
+                            <template x-for="priority in ['low', 'medium', 'high', 'urgent']" :key="priority">
+                                <button type="button"
+                                        @click="editTask.priority = priority"
+                                        :class="{
+                                            'ring-2 ring-blue-500': editTask.priority === priority,
+                                            'bg-green-100 text-green-800': priority === 'low',
+                                            'bg-yellow-100 text-yellow-800': priority === 'medium',
+                                            'bg-orange-100 text-orange-800': priority === 'high',
+                                            'bg-red-100 text-red-800': priority === 'urgent',
+                                            'opacity-50': editTask.priority !== priority
+                                        }"
+                                        class="px-3 py-2 rounded-lg font-medium text-xs transition-all">
+                                    <span x-text="{'low': '🟢 Low', 'medium': '🟡 Medium', 'high': '🔴 High', 'urgent': '🚨 Urgent'}[priority]"></span>
+                                </button>
+                            </template>
+                        </div>
+                    </div>
+
+                    <!-- Due Date -->
+                    <div>
+                        <label class="block text-xs font-semibold mb-2 transition-colors" :class="darkMode ? 'text-gray-400' : 'text-gray-600'">Due Date</label>
+                        <input type="date"
+                               x-model="editTask.due_date"
+                               class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors text-sm"
+                               :class="darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300 text-gray-900'">
+                        <p class="text-xs mt-2 transition-colors" :class="darkMode ? 'text-gray-500' : 'text-gray-600'">
+                            <span x-show="editTask.due_date" x-text="`Due: ${new Date(editTask.due_date).toLocaleDateString()}`"></span>
+                            <span x-show="!editTask.due_date">No due date set</span>
+                        </p>
+                    </div>
+
+                    <!-- Tags Selection - Scrollable -->
+                    <div>
+                        <label class="block text-xs font-semibold mb-2 transition-colors" :class="darkMode ? 'text-gray-400' : 'text-gray-600'">Tags</label>
+                        <div class="space-y-2 max-h-40 overflow-y-auto">
+                            <template x-for="tag in tags" :key="tag.id">
+                                <label class="flex items-center space-x-2 p-2 rounded-lg cursor-pointer hover:bg-opacity-50 transition-colors"
+                                       :style="`background-color: ${tag.color}20`">
+                                    <input type="checkbox"
+                                           x-model="editTask.tags"
+                                           :value="tag.id"
+                                           class="w-4 h-4 rounded focus:ring-2">
+                                    <span class="text-sm font-medium px-2 py-1 rounded text-white" :style="`background-color: ${tag.color}`" x-text="tag.name"></span>
+                                </label>
+                            </template>
+                            <div x-show="tags.length === 0" class="text-center py-4 text-sm opacity-50 transition-colors"
+                                 :class="darkMode ? 'text-gray-500' : 'text-gray-600'">No tags available</div>
+                        </div>
+                    </div>
                 </div>
             </form>
+
+            <!-- Footer with Actions -->
+            <div class="sticky bottom-0 flex items-center justify-between p-6 border-t transition-colors bg-opacity-95"
+                 :class="darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'">
+                <button type="button"
+                        @click="showEditTaskModal = false"
+                        class="px-6 py-2 border rounded-lg font-medium transition-colors"
+                        :class="darkMode ? 'border-gray-600 text-gray-300 hover:bg-gray-700' : 'border-gray-300 text-gray-700 hover:bg-gray-50'">
+                    Cancel
+                </button>
+                <button type="submit"
+                        @click="updateTask()"
+                        class="px-8 py-2 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-lg hover:shadow-lg transition-all font-bold flex items-center space-x-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                    </svg>
+                    <span>Save Changes</span>
+                </button>
+            </div>
         </div>
     </div>
 
