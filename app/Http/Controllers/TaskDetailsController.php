@@ -208,4 +208,66 @@ class TaskDetailsController extends Controller
 
         return response()->json($task->assignees);
     }
+
+    /**
+     * Upload cover image for task
+     */
+    public function uploadCoverImage(Request $request, Task $task)
+    {
+        $request->validate([
+            'cover_image' => 'required|image|max:5120', // 5MB max
+        ]);
+
+        $file = $request->file('cover_image');
+        $path = $file->store('covers/' . $task->id, 'public');
+
+        // Delete old cover image if exists
+        if ($task->cover_image && Storage::disk('public')->exists($task->cover_image)) {
+            Storage::disk('public')->delete($task->cover_image);
+        }
+
+        $task->update(['cover_image' => $path]);
+
+        return response()->json(['cover_image' => $path]);
+    }
+
+    /**
+     * Delete cover image from task
+     */
+    public function deleteCoverImage(Task $task)
+    {
+        if ($task->cover_image && Storage::disk('public')->exists($task->cover_image)) {
+            Storage::disk('public')->delete($task->cover_image);
+        }
+
+        $task->update(['cover_image' => null]);
+
+        return response()->json(null, 204);
+    }
+
+    /**
+     * Archive a task
+     */
+    public function archive(Task $task)
+    {
+        $task->update([
+            'archived' => true,
+            'archived_at' => now(),
+        ]);
+
+        return response()->json($task);
+    }
+
+    /**
+     * Restore an archived task
+     */
+    public function restore(Task $task)
+    {
+        $task->update([
+            'archived' => false,
+            'archived_at' => null,
+        ]);
+
+        return response()->json($task);
+    }
 }

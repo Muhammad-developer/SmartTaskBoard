@@ -15,10 +15,14 @@ class Board extends Model
         'position',
         'team_id',
         'created_by',
+        'archived',
+        'archived_at',
     ];
 
     protected $casts = [
         'position' => 'integer',
+        'archived' => 'boolean',
+        'archived_at' => 'datetime',
     ];
 
     public function columns(): HasMany

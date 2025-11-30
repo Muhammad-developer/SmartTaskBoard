@@ -93,6 +93,14 @@ Route::middleware('auth')->group(function () {
         // Task Assignees API routes
         Route::post('tasks/{task}/assignees', [TaskDetailsController::class, 'assignUser'])->name('tasks.assignees.store');
         Route::delete('tasks/{task}/assignees/{user}', [TaskDetailsController::class, 'unassignUser'])->name('tasks.assignees.destroy');
+
+        // Task Cover Image API routes
+        Route::post('tasks/{task}/cover-image', [TaskDetailsController::class, 'uploadCoverImage'])->name('tasks.cover-image.store');
+        Route::delete('tasks/{task}/cover-image', [TaskDetailsController::class, 'deleteCoverImage'])->name('tasks.cover-image.destroy');
+
+        // Task Archive API routes
+        Route::post('tasks/{task}/archive', [TaskDetailsController::class, 'archive'])->name('tasks.archive');
+        Route::post('tasks/{task}/restore', [TaskDetailsController::class, 'restore'])->name('tasks.restore');
     });
 
     // Locale routes

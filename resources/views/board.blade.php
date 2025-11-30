@@ -1078,6 +1078,9 @@ function taskBoard() {
             column_id: null,
             estimated_hours: null,
             time_spent: 0,
+            cover_image: null,
+            archived: false,
+            archived_at: null,
             tags: [],
             assignees: [],
             comments: [],
@@ -1825,6 +1828,90 @@ function taskBoard() {
                 this.editingTask.tags.splice(index, 1);
             } else {
                 this.editingTask.tags.push(tagId);
+            }
+        },
+
+        async handleCoverImageUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const formData = new FormData();
+            formData.append('cover_image', file);
+
+            try {
+                const response = await fetch(`/api/tasks/${this.editingTask.id}/cover-image`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                    },
+                    body: formData
+                });
+
+                if (response.ok) {
+                    const result = await response.json();
+                    this.editingTask.cover_image = result.cover_image;
+                    this.showToast('Cover image uploaded successfully', 'success');
+                }
+            } catch (error) {
+                console.error('Error uploading cover image:', error);
+                this.showToast('Error uploading cover image', 'error');
+            }
+        },
+
+        async deleteCoverImage() {
+            try {
+                const response = await fetch(`/api/tasks/${this.editingTask.id}/cover-image`, {
+                    method: 'DELETE',
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                    }
+                });
+
+                if (response.ok) {
+                    this.editingTask.cover_image = null;
+                    this.showToast('Cover image deleted', 'success');
+                }
+            } catch (error) {
+                console.error('Error deleting cover image:', error);
+                this.showToast('Error deleting cover image', 'error');
+            }
+        },
+
+        async archiveTask() {
+            try {
+                const response = await fetch(`/api/tasks/${this.editingTask.id}/archive`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                    }
+                });
+
+                if (response.ok) {
+                    this.editingTask = await response.json();
+                    this.showToast('Task archived', 'success');
+                }
+            } catch (error) {
+                console.error('Error archiving task:', error);
+                this.showToast('Error archiving task', 'error');
+            }
+        },
+
+        async restoreTask() {
+            try {
+                const response = await fetch(`/api/tasks/${this.editingTask.id}/restore`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                    }
+                });
+
+                if (response.ok) {
+                    this.editingTask = await response.json();
+                    this.showToast('Task restored', 'success');
+                }
+            } catch (error) {
+                console.error('Error restoring task:', error);
+                this.showToast('Error restoring task', 'error');
             }
         }
     }

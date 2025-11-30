@@ -20,11 +20,16 @@ class Task extends Model
         'created_by',
         'estimated_hours',
         'time_spent',
+        'cover_image',
+        'archived',
+        'archived_at',
     ];
 
     protected $casts = [
         'position' => 'integer',
         'due_date' => 'datetime',
+        'archived' => 'boolean',
+        'archived_at' => 'datetime',
     ];
 
     public function column(): BelongsTo

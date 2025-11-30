@@ -33,6 +33,38 @@
                                placeholder="Task title">
                     </div>
 
+                    <!-- Cover Image Section -->
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">📸 Cover Image</label>
+                        <div class="relative">
+                            <!-- Cover Image Preview -->
+                            <div x-show="editingTask.cover_image" class="mb-3 relative">
+                                <img :src="`/storage/${editingTask.cover_image}`" alt="Cover" class="w-full h-40 object-cover rounded-lg">
+                                <button @click="deleteCoverImage()"
+                                        class="absolute top-2 right-2 bg-red-500 hover:bg-red-600 text-white rounded-full p-2 transition-colors">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                    </svg>
+                                </button>
+                            </div>
+
+                            <!-- Upload Area -->
+                            <div class="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-4 text-center cursor-pointer hover:border-blue-500 transition-colors"
+                                 @click="document.getElementById('coverImageInput').click()"
+                                 x-show="!editingTask.cover_image">
+                                <input type="file"
+                                       id="coverImageInput"
+                                       class="hidden"
+                                       @change="handleCoverImageUpload($event)"
+                                       accept="image/*">
+                                <svg class="w-8 h-8 mx-auto text-gray-400 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                                </svg>
+                                <p class="text-sm text-gray-600 dark:text-gray-400">Click to upload cover image</p>
+                            </div>
+                        </div>
+                    </div>
+
                     <!-- Task Description -->
                     <div>
                         <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">{{ trans('messages.task_description') ?? 'Description' }}</label>
@@ -289,10 +321,22 @@
 
         <!-- Footer with Actions -->
         <div class="flex items-center justify-between px-8 py-4 border-t dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50">
-            <button @click="deleteCurrentTask()"
-                    class="px-4 py-2 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg font-medium transition-colors">
-                Delete Task
-            </button>
+            <div class="flex gap-2">
+                <button @click="deleteCurrentTask()"
+                        class="px-4 py-2 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg font-medium transition-colors">
+                    Delete Task
+                </button>
+                <button x-show="!editingTask.archived"
+                        @click="archiveTask()"
+                        class="px-4 py-2 text-orange-600 hover:bg-orange-50 dark:hover:bg-orange-900/20 rounded-lg font-medium transition-colors">
+                    Archive
+                </button>
+                <button x-show="editingTask.archived"
+                        @click="restoreTask()"
+                        class="px-4 py-2 text-green-600 hover:bg-green-50 dark:hover:bg-green-900/20 rounded-lg font-medium transition-colors">
+                    Restore
+                </button>
+            </div>
             <div class="flex gap-3">
                 <button @click="showTaskDetailsModal = false"
                         class="px-6 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 font-medium transition-colors">
