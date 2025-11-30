@@ -11,9 +11,10 @@ class LocaleController extends Controller
      */
     public function change(Request $request, $locale)
     {
-        $validated = $request->validate([
-            'locale' => 'required|in:en,ru',
-        ]);
+        // Validate locale parameter
+        if (!in_array($locale, ['en', 'ru'])) {
+            return back()->withErrors(['locale' => 'Invalid language selected']);
+        }
 
         // Update session locale
         $request->session()->put('locale', $locale);
@@ -23,6 +24,6 @@ class LocaleController extends Controller
             auth()->user()->update(['locale' => $locale]);
         }
 
-        return back()->with('success', 'Language changed successfully!');
+        return back();
     }
 }
