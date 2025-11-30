@@ -107,9 +107,40 @@
                         <option value="urgent" x-text="translate('priority.urgent')"></option>
                     </select>
 
+                    <!-- Tags Filter Dropdown -->
+                    <div class="relative group">
+                        <button class="px-4 py-2 border rounded-xl transition-colors flex items-center space-x-2"
+                                :class="darkMode ? 'bg-gray-700 border-gray-600 text-white hover:bg-gray-600' : 'bg-white border-gray-300 text-gray-900 hover:bg-gray-50'">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path>
+                            </svg>
+                            <span x-text="translate('filter_by_tags')"></span>
+                            <span x-show="filterTags.length > 0" class="ml-1 px-2 py-0 bg-blue-500 text-white text-xs rounded-full" x-text="filterTags.length"></span>
+                        </button>
+                        <div class="hidden absolute right-0 mt-2 w-64 bg-white border border-gray-300 rounded-xl shadow-lg p-4 group-hover:block z-10 transition-colors"
+                             :class="darkMode ? 'bg-gray-700 border-gray-600' : ''">
+                            <div class="grid grid-cols-2 gap-2 max-h-48 overflow-y-auto">
+                                <template x-for="tag in tags" :key="tag.id">
+                                    <label class="flex items-center space-x-2 p-2 hover:bg-gray-100 rounded cursor-pointer transition-colors"
+                                           :class="darkMode ? 'hover:bg-gray-600' : ''">
+                                        <input type="checkbox"
+                                               x-model="filterTags"
+                                               :value="tag.id"
+                                               class="w-4 h-4 text-blue-600 rounded focus:ring-blue-500 focus:ring-2">
+                                        <span class="text-xs font-medium px-2 py-1 rounded text-white"
+                                              :style="`background-color: ${tag.color}`"
+                                              x-text="tag.name"></span>
+                                    </label>
+                                </template>
+                                <div x-show="tags.length === 0" class="col-span-2 text-center py-4 text-sm opacity-50 transition-colors"
+                                     :class="darkMode ? 'text-gray-400' : 'text-gray-500'" x-text="translate('no_tags')"></div>
+                            </div>
+                        </div>
+                    </div>
+
                     <!-- Clear Filters -->
                     <button @click="clearFilters()"
-                            x-show="searchQuery || filterPriority"
+                            x-show="searchQuery || filterPriority || filterTags.length > 0"
                             class="px-4 py-2 rounded-xl transition-all duration-200 flex items-center space-x-2"
                             :class="darkMode ? 'bg-gray-700 text-gray-300 hover:bg-gray-600' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -332,6 +363,28 @@
                            :class="darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300 text-gray-900'">
                 </div>
 
+                <!-- Tags Selection -->
+                <div class="mb-6">
+                    <label class="block text-sm font-medium mb-3 transition-colors" :class="darkMode ? 'text-gray-300' : 'text-gray-700'" x-text="translate('tags')"></label>
+                    <div class="grid grid-cols-3 gap-2 max-h-48 overflow-y-auto p-2 border rounded-xl transition-colors"
+                         :class="darkMode ? 'bg-gray-700 border-gray-600' : 'bg-gray-50 border-gray-300'">
+                        <template x-for="tag in tags" :key="tag.id">
+                            <label class="flex items-center space-x-2 p-2 hover:bg-gray-100 rounded cursor-pointer transition-colors"
+                                   :class="darkMode ? 'hover:bg-gray-600' : ''">
+                                <input type="checkbox"
+                                       x-model="newTask.tags"
+                                       :value="tag.id"
+                                       class="w-4 h-4 text-blue-600 rounded focus:ring-blue-500 focus:ring-2">
+                                <span class="text-xs font-medium px-2 py-1 rounded text-white"
+                                      :style="`background-color: ${tag.color}`"
+                                      x-text="tag.name"></span>
+                            </label>
+                        </template>
+                        <div x-show="tags.length === 0" class="col-span-3 text-center py-4 text-sm opacity-50 transition-colors"
+                             :class="darkMode ? 'text-gray-400' : 'text-gray-500'" x-text="translate('no_tags')"></div>
+                    </div>
+                </div>
+
                 <!-- Buttons -->
                 <div class="flex space-x-3">
                     <button type="button"
@@ -412,6 +465,28 @@
                            x-model="editTask.due_date"
                            class="w-full px-4 py-2 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
                            :class="darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300 text-gray-900'">
+                </div>
+
+                <!-- Tags Selection -->
+                <div class="mb-6">
+                    <label class="block text-sm font-medium mb-3 transition-colors" :class="darkMode ? 'text-gray-300' : 'text-gray-700'" x-text="translate('tags')"></label>
+                    <div class="grid grid-cols-3 gap-2 max-h-48 overflow-y-auto p-2 border rounded-xl transition-colors"
+                         :class="darkMode ? 'bg-gray-700 border-gray-600' : 'bg-gray-50 border-gray-300'">
+                        <template x-for="tag in tags" :key="tag.id">
+                            <label class="flex items-center space-x-2 p-2 hover:bg-gray-100 rounded cursor-pointer transition-colors"
+                                   :class="darkMode ? 'hover:bg-gray-600' : ''">
+                                <input type="checkbox"
+                                       x-model="editTask.tags"
+                                       :value="tag.id"
+                                       class="w-4 h-4 text-blue-600 rounded focus:ring-blue-500 focus:ring-2">
+                                <span class="text-xs font-medium px-2 py-1 rounded text-white"
+                                      :style="`background-color: ${tag.color}`"
+                                      x-text="tag.name"></span>
+                            </label>
+                        </template>
+                        <div x-show="tags.length === 0" class="col-span-3 text-center py-4 text-sm opacity-50 transition-colors"
+                             :class="darkMode ? 'text-gray-400' : 'text-gray-500'" x-text="translate('no_tags')"></div>
+                    </div>
                 </div>
 
                 <!-- Buttons -->
@@ -1138,12 +1213,22 @@ function taskBoard() {
                 filtered = filtered.filter(task => task.priority === this.filterPriority);
             }
 
+            // Tags filter
+            if (this.filterTags.length > 0) {
+                filtered = filtered.filter(task => {
+                    if (!task.tags || task.tags.length === 0) return false;
+                    const taskTagIds = task.tags.map(t => t.id.toString());
+                    return this.filterTags.some(tagId => taskTagIds.includes(tagId.toString()));
+                });
+            }
+
             return filtered;
         },
 
         clearFilters() {
             this.searchQuery = '';
             this.filterPriority = '';
+            this.filterTags = [];
         },
 
         // Tag Management

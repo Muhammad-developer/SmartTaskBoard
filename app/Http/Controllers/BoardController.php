@@ -32,7 +32,12 @@ class BoardController extends Controller
 
         $tags = Tag::all();
 
-        return view('board', compact('board', 'boards', 'tags'));
+        // Get users for assignment (team members or all users)
+        $users = $board->team
+            ? $board->team->members()->get()
+            : \App\Models\User::all();
+
+        return view('board', compact('board', 'boards', 'tags', 'users'));
     }
 
     public function list()
