@@ -284,7 +284,7 @@ class DatabaseSeeder extends Seeder
     private function createTasks(array $columns, array $users, array $tags): array
     {
         $tasks = [];
-        $priorities = ['high', 'medium', 'low', null];
+        $priorities = ['high', 'medium', 'low', 'medium'];
 
         $taskTemplates = [
             'Fix login authentication bug',
@@ -419,7 +419,7 @@ class DatabaseSeeder extends Seeder
                     Attachment::create([
                         'task_id' => $task->id,
                         'user_id' => $users[rand(0, count($users) - 1)]->id,
-                        'filename' => $template['name'],
+                        'file_name' => $template['name'],
                         'file_path' => 'attachments/' . Str::random(40) . '/' . $template['name'],
                         'file_size' => $template['size'],
                         'mime_type' => $template['type'],
